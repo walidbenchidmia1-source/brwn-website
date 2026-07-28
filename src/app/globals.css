@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+:root {
+  --background: #F9F6F0;
+  --foreground: #150B07;
+  --brand-offwhite: #F9F6F0;
+  --brand-brown: #3D2216;
+  --brand-dark: #150B07;
+  --brand-cream: #DFD3C3;
+  --brand-gold: #C4A484;
+}
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand-offwhite: var(--brand-offwhite);
+  --color-brand-brown: var(--brand-brown);
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-cream: var(--brand-cream);
+  --color-brand-gold: var(--brand-gold);
+  
+  --font-serif: "roc-grotesk", var(--font-sans), sans-serif;
+  --font-sans: "roc-grotesk", var(--font-sans), sans-serif;
+}
+
+/* Custom styles for smooth scrolling (Lenis) */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overflow: clip;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* Hide scrollbar but keep functionality */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
