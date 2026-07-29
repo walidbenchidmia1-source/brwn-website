@@ -25,14 +25,13 @@ async function checkAdminAuth() {
   return { isAdmin: true, user, error: null };
 }
 
-// S'assurer automatiquement que le bucket 'hero-images' existe dans Supabase Storage
 async function ensureHeroBucket(supabaseAdmin: any) {
   try {
     const { data: bucket } = await supabaseAdmin.storage.getBucket("hero-images");
     if (!bucket) {
       await supabaseAdmin.storage.createBucket("hero-images", {
         public: true,
-        fileSizeLimit: 8388608, // 8 Mo
+        fileSizeLimit: 8388608,
         allowedMimeTypes: ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/avif", "video/mp4", "video/webm"],
       });
     }
@@ -50,13 +49,22 @@ export async function GET() {
     }
 
     const supabaseAdmin = createAdminClient();
-    const { data: slides, error } = await supabaseAdmin
+    const { data: slides, error: slidesError } = await supabaseAdmin
       .from("hero_slides")
       .select("*")
       .order("position", { ascending: true });
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    if (slidesError && slidesError.message.includes("Could not find the table")) {
+      return NextResponse.json({
+        slides: [],
+        settings: {
+          id: "global",
+          autoplay_enabled: true,
+          autoplay_interval_ms: 6000,
+          transition_duration_ms: 700,
+        },
+        warning: "La table 'public.hero_slides' n'a pas encore été créée dans Supabase. Veuillez exécuter le script SETUP_HERO_CAROUSEL.sql dans le SQL Editor de Supabase.",
+      });
     }
 
     const { data: settingsData } = await supabaseAdmin
@@ -105,10 +113,9 @@ export async function POST(req: NextRequest) {
 
     const supabaseAdmin = createAdminClient();
 
-    // S'assurer que le bucket storage existe avant toute opération d'upload
     await ensureHeroBucket(supabaseAdmin);
 
-    // Action 1: Mise à jour des paramètres globaux du Hero (Autoplay, Intervalle, Transition)
+    // Action 1: Mise à jour des paramètres globaux du Hero
     if (action === "update_settings" && heroSettings) {
       const { data: updatedSettings, error } = await supabaseAdmin
         .from("hero_settings")
@@ -127,6 +134,11 @@ export async function POST(req: NextRequest) {
         .single();
 
       if (error) {
+        if (error.message.includes("Could not find the table")) {
+          return NextResponse.json({
+            error: "La table 'public.hero_settings' n'existe pas encore dans Supabase. Veuillez exécuter le script SQL dans le Supabase SQL Editor."
+          }, { status: 400 });
+        }
         return NextResponse.json({ error: error.message }, { status: 500 });
       }
 
@@ -277,7 +289,14 @@ export async function POST(req: NextRequest) {
           .eq("id", existingSlide.id)
           .select()
           .single();
-        if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+        if (error) {
+          if (error.message.includes("Could not find the table")) {
+            return NextResponse.json({
+              error: "La table 'public.hero_slides' n'a pas encore été créée dans Supabase. Veuillez exécuter le script SETUP_HERO_CAROUSEL.sql dans le SQL Editor de Supabase."
+            }, { status: 400 });
+          }
+          return NextResponse.json({ error: error.message }, { status: 500 });
+        }
         resultSlide = data;
       } else {
         const { data, error } = await supabaseAdmin
@@ -285,7 +304,14 @@ export async function POST(req: NextRequest) {
           .insert(slidePayload)
           .select()
           .single();
-        if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+        if (error) {
+          if (error.message.includes("Could not find the table")) {
+            return NextResponse.json({
+              error: "La table 'public.hero_slides' n'a pas encore été créée dans Supabase. Veuillez exécuter le script SETUP_HERO_CAROUSEL.sql dans le SQL Editor de Supabase."
+            }, { status: 400 });
+          }
+          return NextResponse.json({ error: error.message }, { status: 500 });
+        }
         resultSlide = data;
       }
 
