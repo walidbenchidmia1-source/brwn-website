@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
-import { LogOut, LayoutDashboard, Package, ShieldCheck, ShoppingBag, Settings } from "lucide-react";
+import { LogOut, LayoutDashboard, Package, ShieldCheck, ShoppingBag, Settings, LayoutTemplate } from "lucide-react";
 
 export default async function AdminLayout({
   children,
@@ -66,6 +66,13 @@ export default async function AdminLayout({
               Commandes
             </Link>
             <Link
+              href="/admin/settings/homepage"
+              className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#3D2216] bg-[#C4A484]/20 hover:bg-[#C4A484]/35 px-3 py-1.5 rounded-full border border-[#C4A484]/40 transition-all shadow-2xs"
+            >
+              <LayoutTemplate className="w-4 h-4 text-[#D97706]" />
+              Carrousel Accueil
+            </Link>
+            <Link
               href="/admin/settings"
               className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#3D2216]/70 hover:text-[#3D2216] transition-colors"
             >
@@ -123,6 +130,13 @@ export default async function AdminLayout({
           >
             <ShoppingBag className="w-3.5 h-3.5" />
             Commandes
+          </Link>
+          <Link
+            href="/admin/settings/homepage"
+            className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[#3D2216] py-1.5 px-3 bg-[#C4A484]/25 border border-[#C4A484]/50 rounded-full font-extrabold"
+          >
+            <LayoutTemplate className="w-3.5 h-3.5 text-[#D97706]" />
+            Carrousel Accueil
           </Link>
           <Link
             href="/admin/settings"

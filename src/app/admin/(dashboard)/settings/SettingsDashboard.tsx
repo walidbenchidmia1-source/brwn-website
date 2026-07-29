@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Save, Plus, Trash2, ShieldCheck, MapPin, Calendar, Clock, Percent, AlertTriangle } from "lucide-react";
+import Link from "next/link";
+import { Save, Plus, Trash2, ShieldCheck, MapPin, Calendar, Clock, Percent, AlertTriangle, LayoutTemplate } from "lucide-react";
 
 interface Props {
   settings: any;
@@ -353,6 +354,14 @@ export default function SettingsDashboard({ settings, zones, slots, closedDates,
             </button>
           );
         })}
+
+        <Link
+          href="/admin/settings/homepage"
+          className="w-full p-3 rounded-xl text-left text-xs font-bold uppercase tracking-wider flex items-center gap-2.5 transition-all cursor-pointer bg-[#C4A484]/15 hover:bg-[#C4A484]/25 text-[#3D2216] border border-[#C4A484]/30 mt-2"
+        >
+          <LayoutTemplate className="w-4 h-4 text-[#D97706]" />
+          Carrousel Accueil (Hero)
+        </Link>
       </div>
 
       {/* Form Content container */}
