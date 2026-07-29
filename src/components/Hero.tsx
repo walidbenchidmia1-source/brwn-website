@@ -314,8 +314,7 @@ export default function Hero() {
         })}
       </div>
 
-      {/* Semi-transparent tint overlay (Préservé) */}
-      <div className="absolute inset-0 bg-[#FAF7F2]/80 backdrop-blur-[1px] pointer-events-none z-2" />
+      {/* Dynamic Background Cover Carousel */}
 
       {/* Background Palm Leaf Shadow Pattern (Préservé) */}
       <div

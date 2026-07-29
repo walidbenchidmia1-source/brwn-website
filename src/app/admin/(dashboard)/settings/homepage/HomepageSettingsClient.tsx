@@ -741,7 +741,7 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
             />
           )}
 
-          <div className="absolute inset-0 bg-[#FAF7F2]/80 backdrop-blur-[1px] pointer-events-none" />
+
 
           <div className="relative z-10 max-w-xl">
             <h3 className="text-2xl sm:text-4xl font-extrabold text-[#150B07] uppercase tracking-tight">
