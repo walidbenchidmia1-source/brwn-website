@@ -104,6 +104,8 @@ export async function POST(req: NextRequest) {
       isMobile = false,
       alt_text,
       title_text,
+      subtitle_text,
+      button_text,
       aria_label,
       is_active,
       crop_data,
@@ -136,7 +138,7 @@ export async function POST(req: NextRequest) {
       if (error) {
         if (error.message.includes("Could not find the table")) {
           return NextResponse.json({
-            error: "La table 'public.hero_settings' n'existe pas encore dans Supabase. Veuillez exécuter le script SQL dans le Supabase SQL Editor."
+            error: "La table 'public.hero_settings' n'existe pas encore dans Supabase."
           }, { status: 400 });
         }
         return NextResponse.json({ error: error.message }, { status: 500 });
@@ -255,7 +257,9 @@ export async function POST(req: NextRequest) {
         media_type: media_type || "image",
         position: position || existingSlide?.position || 1,
         alt_text: alt_text || existingSlide?.alt_text || "Image de couverture BRWN",
-        title_text: title_text || existingSlide?.title_text || "BRWN Tiramisu Gastronomique",
+        title_text: title_text || existingSlide?.title_text || "Le Tiramisu Réinventé",
+        subtitle_text: subtitle_text || existingSlide?.subtitle_text || "Le premier tiramisu gastronomique au café de spécialité fait son entrée officielle au menu.",
+        button_text: button_text || existingSlide?.button_text || "Commander l'Original",
         aria_label: aria_label || existingSlide?.aria_label || "Image du carrousel de couverture BRWN",
         is_active: is_active !== undefined ? is_active : (existingSlide?.is_active ?? true),
         file_size_bytes: buffer.length,
@@ -292,7 +296,7 @@ export async function POST(req: NextRequest) {
         if (error) {
           if (error.message.includes("Could not find the table")) {
             return NextResponse.json({
-              error: "La table 'public.hero_slides' n'a pas encore été créée dans Supabase. Veuillez exécuter le script SETUP_HERO_CAROUSEL.sql dans le SQL Editor de Supabase."
+              error: "La table 'public.hero_slides' n'a pas encore été créée dans Supabase."
             }, { status: 400 });
           }
           return NextResponse.json({ error: error.message }, { status: 500 });
@@ -307,7 +311,7 @@ export async function POST(req: NextRequest) {
         if (error) {
           if (error.message.includes("Could not find the table")) {
             return NextResponse.json({
-              error: "La table 'public.hero_slides' n'a pas encore été créée dans Supabase. Veuillez exécuter le script SETUP_HERO_CAROUSEL.sql dans le SQL Editor de Supabase."
+              error: "La table 'public.hero_slides' n'a pas encore été créée dans Supabase."
             }, { status: 400 });
           }
           return NextResponse.json({ error: error.message }, { status: 500 });
@@ -318,7 +322,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, slide: resultSlide, message: "Image enregistrée avec succès" });
     }
 
-    // Action 5: Mise à jour simple des métadonnées
+    // Action 5: Mise à jour simple des métadonnées (titre, sous-titre, texte du bouton, alt, active)
     if (slideId) {
       const updatePayload: any = {
         updated_at: new Date().toISOString(),
@@ -326,6 +330,8 @@ export async function POST(req: NextRequest) {
       };
       if (alt_text !== undefined) updatePayload.alt_text = alt_text;
       if (title_text !== undefined) updatePayload.title_text = title_text;
+      if (subtitle_text !== undefined) updatePayload.subtitle_text = subtitle_text;
+      if (button_text !== undefined) updatePayload.button_text = button_text;
       if (aria_label !== undefined) updatePayload.aria_label = aria_label;
       if (is_active !== undefined) updatePayload.is_active = is_active;
       if (crop_data !== undefined) updatePayload.crop_data = crop_data;

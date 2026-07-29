@@ -13,6 +13,8 @@ interface HeroSlide {
   mobile_image_url?: string | null;
   alt_text: string;
   title_text?: string | null;
+  subtitle_text?: string | null;
+  button_text?: string | null;
   aria_label?: string | null;
   position: number;
   crop_data?: { zoom: number; x: number; y: number } | null;
@@ -300,6 +302,7 @@ export default function Hero() {
                   aria-label={slide.aria_label || undefined}
                   fill
                   priority={idx === 0}
+                  quality={95}
                   sizes="100vw"
                   className="object-cover"
                   style={{
@@ -354,36 +357,41 @@ export default function Hero() {
         <Image src="/images/cocoa_dust.png" alt="Cocoa splash" fill sizes="128px" className="object-contain" />
       </div>
 
-      {/* Central Content (Préservé à 100%) */}
-      <div
-        ref={contentRef}
-        className="relative max-w-4xl w-full flex flex-col items-center text-center z-20 px-4 gap-4 md:gap-0"
-      >
-        <h1
-          ref={titleRef}
-          className="font-sans font-extrabold text-[#150B07] text-3xl sm:text-5xl md:text-[4.5vw] tracking-tighter leading-[1.15] uppercase"
-        >
-          Le Tiramisu Réinventé
-        </h1>
+      {/* Central Content (Modifiable depuis le Dashboard Admin) */}
+      {(() => {
+        const currentSlide = slides[currentIndex % slides.length] || slides[0];
+        return (
+          <div
+            ref={contentRef}
+            className="relative max-w-4xl w-full flex flex-col items-center text-center z-20 px-4 gap-4 md:gap-0"
+          >
+            <h1
+              ref={titleRef}
+              className="font-sans font-extrabold text-[#150B07] text-3xl sm:text-5xl md:text-[4.5vw] tracking-tighter leading-[1.15] uppercase transition-all duration-500"
+            >
+              {currentSlide?.title_text || "Le Tiramisu Réinventé"}
+            </h1>
 
-        <p
-          ref={subtitleRef}
-          className="font-sans text-[#3D2216]/80 text-sm sm:text-lg md:text-xl font-light tracking-wide max-w-xl sm:max-w-2xl mt-0 md:mt-6 leading-relaxed"
-        >
-          Le premier tiramisu gastronomique au café de spécialité fait son entrée officielle au menu.
-        </p>
+            <p
+              ref={subtitleRef}
+              className="font-sans text-[#3D2216]/80 text-sm sm:text-lg md:text-xl font-light tracking-wide max-w-xl sm:max-w-2xl mt-0 md:mt-6 leading-relaxed transition-all duration-500"
+            >
+              {currentSlide?.subtitle_text || "Le premier tiramisu gastronomique au café de spécialité fait son entrée officielle au menu."}
+            </p>
 
-        <button
-          ref={buttonRef}
-          onClick={() => {
-            document.getElementById("deconstruction")?.scrollIntoView({ behavior: "smooth" });
-          }}
-          className="mt-0 md:mt-8 px-10 py-4 bg-[#150B07] hover:bg-[#3D2216] text-[#F9F6F0] font-sans text-xs md:text-sm font-semibold tracking-widest uppercase rounded-full shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2"
-        >
-          Commander l'Original
-          <ArrowRight className="w-4 h-4" />
-        </button>
-      </div>
+            <button
+              ref={buttonRef}
+              onClick={() => {
+                document.getElementById("deconstruction")?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="mt-0 md:mt-8 px-10 py-4 bg-[#150B07] hover:bg-[#3D2216] text-[#F9F6F0] font-sans text-xs md:text-sm font-semibold tracking-widest uppercase rounded-full shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2"
+            >
+              {currentSlide?.button_text || "Commander l'Original"}
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        );
+      })()}
 
       {/* Flèches de navigation discrètes */}
       {slides.length > 1 && (

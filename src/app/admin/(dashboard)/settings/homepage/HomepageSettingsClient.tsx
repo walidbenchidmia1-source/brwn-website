@@ -24,7 +24,9 @@ import {
   Play,
   Pause,
   Sliders,
-  Timer
+  Timer,
+  Type,
+  AlignLeft
 } from "lucide-react";
 
 interface HeroSlide {
@@ -40,6 +42,8 @@ interface HeroSlide {
   previous_mobile_image_url?: string | null;
   alt_text: string;
   title_text?: string | null;
+  subtitle_text?: string | null;
+  button_text?: string | null;
   aria_label?: string | null;
   position: number;
   is_active: boolean;
@@ -74,7 +78,9 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
           image_path: "",
           image_url: "/images/hero_background.png",
           alt_text: "Image de couverture BRWN",
-          title_text: "Le Tiramisu Réinventé par BRWN",
+          title_text: "Le Tiramisu Réinventé",
+          subtitle_text: "Le premier tiramisu gastronomique au café de spécialité fait son entrée officielle au menu.",
+          button_text: "Commander l'Original",
           aria_label: `Slide ${pos} - Image de couverture`,
           position: pos,
           is_active: pos === 1,
@@ -188,6 +194,8 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
           isMobile,
           alt_text: currentSlide.alt_text,
           title_text: currentSlide.title_text,
+          subtitle_text: currentSlide.subtitle_text,
+          button_text: currentSlide.button_text,
           aria_label: currentSlide.aria_label,
           is_active: currentSlide.is_active,
           crop_data: currentSlide.crop_data,
@@ -272,7 +280,7 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
     }
   };
 
-  // Métadonnées SEO
+  // Métadonnées SEO et Textes
   const handleMetadataChange = (index: number, field: string, value: string) => {
     setSlides((prev) => {
       const copy = [...prev];
@@ -297,7 +305,6 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
       if (!res.ok || data.error) throw new Error(data.error || "Échec de la mise à jour des options");
 
       setHeroSettings(data.settings);
-      triggerAlert("Options d'animation enregistrées !");
     } catch (err: any) {
       triggerAlert(err.message || "Erreur d'enregistrement", true);
     } finally {
@@ -305,7 +312,7 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
     }
   };
 
-  // Enregistrer tout
+  // Enregistrer tout (Textes, Images, Paramètres)
   const handleSaveAll = async () => {
     setIsLoading(true);
     try {
@@ -319,6 +326,8 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
               slideId: slide.id,
               alt_text: slide.alt_text,
               title_text: slide.title_text,
+              subtitle_text: slide.subtitle_text,
+              button_text: slide.button_text,
               aria_label: slide.aria_label,
               is_active: slide.is_active,
               crop_data: slide.crop_data,
@@ -326,7 +335,7 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
           });
         }
       }
-      triggerAlert("Tous les réglages du carrousel et options d'animation ont été enregistrés !");
+      triggerAlert("Tous les titres, sous-titres, boutons et images ont été enregistrés !");
     } catch (err: any) {
       triggerAlert(err.message || "Erreur d'enregistrement", true);
     } finally {
@@ -422,6 +431,9 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
           image_path: "",
           image_url: "/images/hero_background.png",
           alt_text: "Image de couverture BRWN",
+          title_text: "Le Tiramisu Réinventé",
+          subtitle_text: "Le premier tiramisu gastronomique au café de spécialité fait son entrée officielle au menu.",
+          button_text: "Commander l'Original",
           position: target.position,
           is_active: false,
         };
@@ -437,6 +449,7 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
   };
 
   const activeSlides = slides.filter((s) => s.is_active);
+  const currentPreviewSlide = activeSlides[activePreviewIndex % (activeSlides.length || 1)] || slides[0];
 
   return (
     <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6">
@@ -451,10 +464,10 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
             Retour aux Réglages
           </Link>
           <h1 className="text-2xl sm:text-3xl font-black uppercase text-[#3D2216]">
-            Carrousel de Couverture (Hero)
+            Carrousel de Couverture & Textes (Hero)
           </h1>
           <p className="text-xs text-[#3D2216]/70 mt-1">
-            Gérez jusqu'à 3 images/vidéos de couverture et configurez les options d'animation dynamiques.
+            Modifiez le titre, le sous-titre, le bouton et les images du Hero pour chaque slide.
           </p>
         </div>
 
@@ -483,7 +496,7 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
         </div>
       )}
 
-      {/* SECTION NOUNELLE: PANNEAU DES OPTIONS GLOBALES DU HERO (Autoplay, Intervalle, Transition) */}
+      {/* PANNEAU DES OPTIONS GLOBALES DU HERO */}
       <div className="bg-white border border-[#3D2216]/10 rounded-3xl p-6 shadow-sm mb-8">
         <div className="flex items-center gap-2 mb-4">
           <Sliders className="w-5 h-5 text-[#D97706]" />
@@ -493,7 +506,6 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Autoplay Enabled Toggle */}
           <div className="flex flex-col justify-between p-4 bg-[#FAF7F2] border border-[#3D2216]/10 rounded-2xl">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-bold uppercase text-[#3D2216] flex items-center gap-1.5">
@@ -514,7 +526,6 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
             </p>
           </div>
 
-          {/* Autoplay Interval Input */}
           <div className="p-4 bg-[#FAF7F2] border border-[#3D2216]/10 rounded-2xl">
             <label className="block text-xs font-bold uppercase text-[#3D2216] mb-1.5 flex items-center gap-1.5">
               <Timer className="w-4 h-4 text-[#C4A484]" />
@@ -533,7 +544,6 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
             />
           </div>
 
-          {/* Transition Duration Input */}
           <div className="p-4 bg-[#FAF7F2] border border-[#3D2216]/10 rounded-2xl">
             <label className="block text-xs font-bold uppercase text-[#3D2216] mb-1.5 flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-[#C4A484]" />
@@ -554,7 +564,7 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
         </div>
       </div>
 
-      {/* Cartes des 3 Slides (Position 1, 2, 3) */}
+      {/* Cartes des 3 Slides (Position 1, 2, 3) avec édition des Titres, Sous-titres et Bouton */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
         {slides.map((slide, idx) => (
           <div
@@ -567,7 +577,6 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
               draggedIndex === idx ? "opacity-40 border-dashed border-[#C4A484]" : "border-[#3D2216]/10"
             }`}
           >
-            {/* Header de la carte */}
             <div>
               <div className="flex items-center justify-between mb-4 border-b border-[#3D2216]/5 pb-3">
                 <div className="flex items-center gap-2 cursor-grab active:cursor-grabbing">
@@ -605,6 +614,7 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
                     src={slide.image_url}
                     alt={slide.alt_text}
                     fill
+                    quality={95}
                     className="object-cover transition-transform duration-300"
                     style={{
                       transform: `scale(${slide.crop_data?.zoom || 1}) translate(${slide.crop_data?.x || 0}px, ${slide.crop_data?.y || 0}px)`,
@@ -657,17 +667,6 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
                 </div>
               </div>
 
-              <div className="flex items-center justify-between text-[10px] font-bold text-[#3D2216]/60 mb-4 px-1">
-                <span>
-                  {slide.file_format ? `Format: ${slide.file_format.toUpperCase()}` : "WebP / JPG"}
-                </span>
-                <span>
-                  {slide.file_size_bytes
-                    ? `${(slide.file_size_bytes / (1024 * 1024)).toFixed(2)} Mo`
-                    : "HD Standard"}
-                </span>
-              </div>
-
               {(slide.previous_image_url || slide.previous_mobile_image_url) && (
                 <button
                   onClick={() => handleRestore(idx, false)}
@@ -678,9 +677,51 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
                 </button>
               )}
 
+              {/* SECTION EDITABLE DES TEXTES HERO (TITRE, SOUS-TITRE, BOUTON) */}
               <div className="space-y-3">
                 <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3D2216]/80 mb-1">
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3D2216] mb-1 flex items-center gap-1">
+                    <Type className="w-3 h-3 text-[#D97706]" />
+                    Titre Principal (H1)
+                  </label>
+                  <input
+                    type="text"
+                    value={slide.title_text || ""}
+                    onChange={(e) => handleMetadataChange(idx, "title_text", e.target.value)}
+                    placeholder="Le Tiramisu Réinventé..."
+                    className="w-full text-xs p-2.5 bg-[#FAF7F2] border border-[#3D2216]/10 rounded-xl focus:border-[#C4A484] outline-none font-bold"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3D2216] mb-1 flex items-center gap-1">
+                    <AlignLeft className="w-3 h-3 text-[#D97706]" />
+                    Sous-titre / Description
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={slide.subtitle_text || ""}
+                    onChange={(e) => handleMetadataChange(idx, "subtitle_text", e.target.value)}
+                    placeholder="Le premier tiramisu gastronomique au café de spécialité..."
+                    className="w-full text-xs p-2.5 bg-[#FAF7F2] border border-[#3D2216]/10 rounded-xl focus:border-[#C4A484] outline-none resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3D2216] mb-1">
+                    Texte du Bouton CTA
+                  </label>
+                  <input
+                    type="text"
+                    value={slide.button_text || ""}
+                    onChange={(e) => handleMetadataChange(idx, "button_text", e.target.value)}
+                    placeholder="Commander l'Original..."
+                    className="w-full text-xs p-2.5 bg-[#FAF7F2] border border-[#3D2216]/10 rounded-xl focus:border-[#C4A484] outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3D2216]/70 mb-1">
                     Texte alternatif (ALT SEO)
                   </label>
                   <input
@@ -688,20 +729,7 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
                     value={slide.alt_text || ""}
                     onChange={(e) => handleMetadataChange(idx, "alt_text", e.target.value)}
                     placeholder="Description pour l'accessibilité..."
-                    className="w-full text-xs p-2.5 bg-[#FAF7F2] border border-[#3D2216]/10 rounded-xl focus:border-[#C4A484] outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3D2216]/80 mb-1">
-                    Titre SEO (Title)
-                  </label>
-                  <input
-                    type="text"
-                    value={slide.title_text || ""}
-                    onChange={(e) => handleMetadataChange(idx, "title_text", e.target.value)}
-                    placeholder="Titre au survol..."
-                    className="w-full text-xs p-2.5 bg-[#FAF7F2] border border-[#3D2216]/10 rounded-xl focus:border-[#C4A484] outline-none"
+                    className="w-full text-xs p-2.5 bg-[#FAF7F2] border border-[#3D2216]/10 rounded-xl focus:border-[#C4A484] outline-none text-[#3D2216]/80"
                   />
                 </div>
               </div>
@@ -716,11 +744,11 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
           <div className="flex items-center gap-2">
             <Eye className="w-5 h-5 text-[#C4A484]" />
             <h2 className="text-lg font-black uppercase text-[#3D2216]">
-              Prévisualisation du Carrousel Hero
+              Prévisualisation du Carrousel & Textes Hero
             </h2>
           </div>
           <span className="text-xs font-semibold text-[#3D2216]/60">
-            {activeSlides.length} slide(s) active(s) • Autoplay: {heroSettings.autoplay_enabled ? `${heroSettings.autoplay_interval_ms}ms` : "OFF"}
+            {activeSlides.length} slide(s) active(s)
           </span>
         </div>
 
@@ -730,6 +758,7 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
               src={activeSlides[activePreviewIndex % activeSlides.length]?.image_url || "/images/hero_background.png"}
               alt="Live Preview"
               fill
+              quality={95}
               className="object-cover transition-opacity duration-700"
             />
           ) : (
@@ -737,21 +766,20 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
               src="/images/hero_background.png"
               alt="Default Fallback"
               fill
+              quality={95}
               className="object-cover"
             />
           )}
 
-
-
           <div className="relative z-10 max-w-xl">
             <h3 className="text-2xl sm:text-4xl font-extrabold text-[#150B07] uppercase tracking-tight">
-              Le Tiramisu Réinventé
+              {currentPreviewSlide?.title_text || "Le Tiramisu Réinventé"}
             </h3>
-            <p className="text-xs sm:text-sm text-[#3D2216]/80 mt-3 font-light">
-              Le premier tiramisu gastronomique au café de spécialité fait son entrée officielle au menu.
+            <p className="text-xs sm:text-sm text-[#3D2216]/80 mt-3 font-light leading-relaxed">
+              {currentPreviewSlide?.subtitle_text || "Le premier tiramisu gastronomique au café de spécialité fait son entrée officielle au menu."}
             </p>
             <button className="mt-5 px-6 py-2.5 bg-[#150B07] text-[#FAF7F2] text-xs font-bold uppercase rounded-full tracking-widest shadow-md">
-              Commander l'Original
+              {currentPreviewSlide?.button_text || "Commander l'Original"}
             </button>
           </div>
 
@@ -807,6 +835,7 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
                 src={slides[croppingSlideIndex].image_url}
                 alt="Crop preview"
                 fill
+                quality={95}
                 className="object-cover transition-transform duration-100"
                 style={{
                   transform: `scale(${cropZoom}) translate(${cropX}px, ${cropY}px)`,

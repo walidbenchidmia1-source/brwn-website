@@ -1,5 +1,5 @@
 -- =========================================================================
--- SCRIPT SQL DE CONFIGURATION DU CARROUSEL HERO ET DES PARAMETRES (BRWN)
+-- SCRIPT SQL DE CONFIGURATION DU CARROUSEL HERO ET DES TEXTES (BRWN)
 -- À exécuter dans le Supabase SQL Editor de votre projet
 -- =========================================================================
 
@@ -16,7 +16,9 @@ CREATE TABLE IF NOT EXISTS public.hero_slides (
   previous_mobile_image_path TEXT,
   previous_mobile_image_url TEXT,
   alt_text TEXT NOT NULL DEFAULT 'Image de couverture BRWN',
-  title_text TEXT DEFAULT 'BRWN Tiramisu Gastronomique',
+  title_text TEXT DEFAULT 'Le Tiramisu Réinventé',
+  subtitle_text TEXT DEFAULT 'Le premier tiramisu gastronomique au café de spécialité fait son entrée officielle au menu.',
+  button_text TEXT DEFAULT 'Commander l''Original',
   aria_label TEXT DEFAULT 'Image du carrousel de couverture BRWN',
   position INTEGER NOT NULL CHECK (position BETWEEN 1 AND 3),
   is_active BOOLEAN NOT NULL DEFAULT true,
@@ -28,6 +30,10 @@ CREATE TABLE IF NOT EXISTS public.hero_slides (
   updated_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   CONSTRAINT unique_hero_slide_position UNIQUE (position)
 );
+
+-- Ajouter les colonnes si la table existait déjà
+ALTER TABLE public.hero_slides ADD COLUMN IF NOT EXISTS subtitle_text TEXT DEFAULT 'Le premier tiramisu gastronomique au café de spécialité fait son entrée officielle au menu.';
+ALTER TABLE public.hero_slides ADD COLUMN IF NOT EXISTS button_text TEXT DEFAULT 'Commander l''Original';
 
 -- RLS hero_slides
 ALTER TABLE public.hero_slides ENABLE ROW LEVEL SECURITY;
@@ -51,7 +57,6 @@ CREATE TABLE IF NOT EXISTS public.hero_settings (
   updated_by UUID REFERENCES auth.users(id) ON DELETE SET NULL
 );
 
--- RLS hero_settings
 ALTER TABLE public.hero_settings ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Public read hero settings" ON public.hero_settings;
@@ -77,7 +82,6 @@ ON CONFLICT (id) DO UPDATE SET
   file_size_limit = 8388608,
   allowed_mime_types = ARRAY['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/avif', 'video/mp4', 'video/webm'];
 
--- RLS Storage
 DROP POLICY IF EXISTS "Public select hero images storage" ON storage.objects;
 DROP POLICY IF EXISTS "Admin all storage operations hero images" ON storage.objects;
 
@@ -88,7 +92,7 @@ CREATE POLICY "Admin all storage operations hero images" ON storage.objects
   FOR ALL TO authenticated USING (bucket_id = 'hero-images' AND public.is_admin())
   WITH CHECK (bucket_id = 'hero-images' AND public.is_admin());
 
--- 4. DONNEES INITIALES (SLIDE 1 ET PARAMETRES GLOBAUX)
+-- 4. DONNEES INITIALES
 INSERT INTO public.hero_slides (
   position,
   media_type,
@@ -96,6 +100,8 @@ INSERT INTO public.hero_slides (
   image_url,
   alt_text,
   title_text,
+  subtitle_text,
+  button_text,
   aria_label,
   is_active
 )
@@ -105,7 +111,9 @@ SELECT
   'hero_background_default.png',
   '/images/hero_background.png',
   'Image de couverture originale BRWN Tiramisu',
-  'Le Tiramisu Réinventé par BRWN',
+  'Le Tiramisu Réinventé',
+  'Le premier tiramisu gastronomique au café de spécialité fait son entrée officielle au menu.',
+  'Commander l''Original',
   'Slide 1 - Image de couverture originale',
   true
 WHERE NOT EXISTS (SELECT 1 FROM public.hero_slides WHERE position = 1);

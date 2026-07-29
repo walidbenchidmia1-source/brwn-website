@@ -9,7 +9,9 @@ const DEFAULT_SLIDE = {
   image_url: "/images/hero_background.png",
   mobile_image_url: null,
   alt_text: "BRWN Tiramisu Gastronomique - Image de couverture",
-  title_text: "Le Tiramisu Réinventé par BRWN",
+  title_text: "Le Tiramisu Réinventé",
+  subtitle_text: "Le premier tiramisu gastronomique au café de spécialité fait son entrée officielle au menu.",
+  button_text: "Commander l'Original",
   aria_label: "Carrousel de couverture BRWN",
   position: 1,
   crop_data: { zoom: 1, x: 0, y: 0 },
@@ -25,10 +27,10 @@ export async function GET() {
   try {
     const supabaseAdmin = createAdminClient();
 
-    // 1. Récupération des slides actives (fallback gracieux si la table n'existe pas encore)
+    // 1. Récupération des slides actives (incluant titre, sous-titre et texte du bouton)
     const { data: slides, error: slidesError } = await supabaseAdmin
       .from("hero_slides")
-      .select("id, media_type, image_url, mobile_image_url, alt_text, title_text, aria_label, position, crop_data")
+      .select("id, media_type, image_url, mobile_image_url, alt_text, title_text, subtitle_text, button_text, aria_label, position, crop_data")
       .eq("is_active", true)
       .order("position", { ascending: true });
 
