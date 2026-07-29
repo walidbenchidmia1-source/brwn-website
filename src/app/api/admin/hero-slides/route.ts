@@ -25,6 +25,22 @@ async function checkAdminAuth() {
   return { isAdmin: true, user, error: null };
 }
 
+// S'assurer automatiquement que le bucket 'hero-images' existe dans Supabase Storage
+async function ensureHeroBucket(supabaseAdmin: any) {
+  try {
+    const { data: bucket } = await supabaseAdmin.storage.getBucket("hero-images");
+    if (!bucket) {
+      await supabaseAdmin.storage.createBucket("hero-images", {
+        public: true,
+        fileSizeLimit: 8388608, // 8 Mo
+        allowedMimeTypes: ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/avif", "video/mp4", "video/webm"],
+      });
+    }
+  } catch {
+    // Ignorer si déjà existant
+  }
+}
+
 // GET: Récupérer toutes les slides et les paramètres globaux du Hero
 export async function GET() {
   try {
@@ -88,6 +104,9 @@ export async function POST(req: NextRequest) {
     } = body;
 
     const supabaseAdmin = createAdminClient();
+
+    // S'assurer que le bucket storage existe avant toute opération d'upload
+    await ensureHeroBucket(supabaseAdmin);
 
     // Action 1: Mise à jour des paramètres globaux du Hero (Autoplay, Intervalle, Transition)
     if (action === "update_settings" && heroSettings) {
