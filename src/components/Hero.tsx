@@ -26,12 +26,22 @@ interface HeroSettings {
   transition_duration_ms: number;
 }
 
+interface HeroProps {
+  initialSlides?: HeroSlide[];
+  initialSettings?: HeroSettings;
+}
+
+gsap.registerPlugin(ScrollTrigger);
+
 const DEFAULT_SLIDE: HeroSlide = {
   id: "default-1",
   media_type: "image",
   image_url: "/images/hero_background.png",
-  alt_text: "Image de couverture originale BRWN Tiramisu",
-  title_text: "Le Tiramisu Réinventé par BRWN",
+  mobile_image_url: null,
+  alt_text: "BRWN Tiramisu Gastronomique - Image de couverture",
+  title_text: "Le Tiramisu Réinventé",
+  subtitle_text: "Le premier tiramisu gastronomique au café de spécialité fait son entrée officielle au menu.",
+  button_text: "Commander l'Original",
   aria_label: "Carrousel de couverture BRWN",
   position: 1,
   crop_data: { zoom: 1, x: 0, y: 0 },
@@ -43,7 +53,7 @@ const DEFAULT_SETTINGS: HeroSettings = {
   transition_duration_ms: 700,
 };
 
-export default function Hero() {
+export default function Hero({ initialSlides, initialSettings }: HeroProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
@@ -56,15 +66,30 @@ export default function Hero() {
   const ladyRef = useRef<HTMLDivElement>(null);
   const cocoaRef = useRef<HTMLDivElement>(null);
 
-  // Carousel & Settings states
-  const [slides, setSlides] = useState<HeroSlide[]>([DEFAULT_SLIDE]);
-  const [heroSettings, setHeroSettings] = useState<HeroSettings>(DEFAULT_SETTINGS);
+  // Initialisation immédiate avec les données serveur (évite le flash de 1s)
+  const [slides, setSlides] = useState<HeroSlide[]>(() => {
+    return initialSlides && initialSlides.length > 0 ? initialSlides : [DEFAULT_SLIDE];
+  });
+  const [heroSettings, setHeroSettings] = useState<HeroSettings>(() => {
+    return initialSettings || DEFAULT_SETTINGS;
+  });
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
-  // 1. Récupération des slides et options dynamiques depuis l'API publique
+  // Synchroniser si les props initiales changent
+  useEffect(() => {
+    if (initialSlides && initialSlides.length > 0) {
+      setSlides(initialSlides);
+    }
+    if (initialSettings) {
+      setHeroSettings(initialSettings);
+    }
+  }, [initialSlides, initialSettings]);
+
+  // Récupération de secours / mise à jour côté client
   useEffect(() => {
     async function fetchSlidesAndSettings() {
       try {
@@ -79,7 +104,7 @@ export default function Hero() {
           }
         }
       } catch {
-        // Conserver les valeurs par défaut en cas d'erreur réseau
+        // Conserver les valeurs actuelles en cas d'erreur réseau
       }
     }
 
@@ -100,7 +125,7 @@ export default function Hero() {
     };
   }, []);
 
-  // 2. Défilement automatique dynamique lisant autoplay_enabled et autoplay_interval_ms
+  // Défilement automatique dynamique lisant autoplay_enabled et autoplay_interval_ms
   useEffect(() => {
     if (
       slides.length <= 1 ||
@@ -117,38 +142,13 @@ export default function Hero() {
     }, interval);
 
     return () => clearInterval(timer);
-  }, [
-    slides.length,
-    isPaused,
-    prefersReducedMotion,
-    heroSettings.autoplay_enabled,
-    heroSettings.autoplay_interval_ms,
-  ]);
+  }, [slides.length, isPaused, prefersReducedMotion, heroSettings]);
 
-  // 3. Animations GSAP (Entièrement préservées)
+  // GSAP Animations
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        titleRef.current,
-        { y: 80, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1.2, ease: "power4.out", delay: 0.2 }
-      );
-
-      gsap.fromTo(
-        subtitleRef.current,
-        { y: 40, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1, ease: "power3.out", delay: 0.5 }
-      );
-
-      gsap.fromTo(
-        buttonRef.current,
-        { scale: 0.8, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 0.8, ease: "back.out(1.7)", delay: 0.8 }
-      );
-
       const smallFloaters = [bean1Ref.current, bean2Ref.current, ladyRef.current, cocoaRef.current];
+
       gsap.fromTo(
         smallFloaters,
         { scale: 0, opacity: 0 },
@@ -269,7 +269,7 @@ export default function Hero() {
       onMouseLeave={() => setIsPaused(false)}
       className="relative w-full min-h-[calc(100svh-80px)] md:min-h-0 md:h-[70vh] flex flex-col justify-center md:justify-start items-center pt-16 md:pt-24 overflow-hidden px-6 select-none border-b border-[#3D2216]/5"
     >
-      {/* 1. CARROUSEL D'IMAGES DE FOND DYNAMIQUE AVEC TRANSITION PERSONNALISEE */}
+      {/* 1. CARROUSEL D'IMAGES DE FOND DYNAMIQUE */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         {slides.map((slide, idx) => {
           const isActive = idx === currentIndex;
@@ -317,37 +317,34 @@ export default function Hero() {
         })}
       </div>
 
-      {/* Dynamic Background Cover Carousel */}
-
-      {/* Background Palm Leaf Shadow Pattern (Préservé) */}
+      {/* Background Palm Leaf Shadow Pattern */}
       <div
-        className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay z-3"
+        className="absolute inset-0 pointer-events-none opacity-40 mix-blend-overlay z-3"
         style={{
-          backgroundImage: "radial-gradient(#3D2216 1px, transparent 1px)",
-          backgroundSize: "24px 24px",
+          backgroundImage: `radial-gradient(circle at 50% 50%, rgba(217, 119, 6, 0.08) 0%, transparent 60%)`,
         }}
       />
 
-      {/* Intermediate Parallax Ingredients (Préservé) */}
+      {/* Floating Elements (Préservés à 100%) */}
       <div
         ref={bean1Ref}
-        className="absolute top-[15%] left-[20%] md:left-[25%] w-10 h-10 md:w-16 md:h-16 pointer-events-none z-5 opacity-70 filter drop-shadow-md"
+        className="absolute top-[15%] left-[8%] md:left-[12%] w-12 h-12 md:w-16 md:h-16 pointer-events-none z-10"
       >
-        <Image src="/images/coffee_bean.png" alt="Coffee bean" fill sizes="64px" className="object-contain rotate-45" />
+        <Image src="/images/coffee_bean.png" alt="Coffee bean" fill sizes="64px" className="object-contain" />
       </div>
 
       <div
         ref={bean2Ref}
-        className="absolute bottom-[20%] left-[15%] md:left-[20%] w-12 h-12 md:w-20 md:h-20 pointer-events-none z-5 opacity-70 filter drop-shadow-lg"
+        className="absolute bottom-[20%] right-[10%] md:right-[15%] w-10 h-10 md:w-14 md:h-14 pointer-events-none z-10"
       >
-        <Image src="/images/coffee_bean.png" alt="Coffee bean" fill sizes="80px" className="object-contain -rotate-12" />
+        <Image src="/images/coffee_bean.png" alt="Coffee bean" fill sizes="56px" className="object-contain" />
       </div>
 
       <div
         ref={ladyRef}
-        className="absolute bottom-[18%] right-[15%] md:right-[20%] w-24 h-12 md:w-44 md:h-22 pointer-events-none z-5 opacity-60 filter drop-shadow-xl"
+        className="absolute top-[35%] left-[5%] md:left-[8%] w-14 h-14 md:w-20 md:h-20 pointer-events-none z-10"
       >
-        <Image src="/images/ladyfinger.png" alt="Savoiardi Ladyfinger" fill sizes="176px" className="object-contain rotate-[35deg]" />
+        <Image src="/images/ladyfinger.png" alt="Ladyfinger biscuit" fill sizes="80px" className="object-contain" />
       </div>
 
       <div
@@ -415,16 +412,14 @@ export default function Hero() {
 
       {/* Indicateurs de points */}
       {slides.length > 1 && (
-        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-2.5 z-30">
-          {slides.map((_, idx) => (
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-30">
+          {slides.map((_, i) => (
             <button
-              key={idx}
-              onClick={() => setCurrentIndex(idx)}
-              aria-label={`Aller à l'image ${idx + 1}`}
+              key={i}
+              onClick={() => setCurrentIndex(i)}
+              aria-label={`Aller à l'image ${i + 1}`}
               className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
-                currentIndex === idx
-                  ? "bg-[#3D2216] w-7 shadow-xs"
-                  : "bg-[#3D2216]/40 hover:bg-[#3D2216]/70 w-2.5"
+                currentIndex === i ? "bg-[#3D2216] w-8" : "bg-[#3D2216]/30 w-2.5 hover:bg-[#3D2216]/60"
               }`}
             />
           ))}
