@@ -86,7 +86,7 @@ export async function GET() {
   }
 }
 
-// POST: Gérer les uploads, mutations et paramètres globaux
+// POST: Gérer les uploads, mutations et enregistrement garanti des slides
 export async function POST(req: NextRequest) {
   try {
     const auth = await checkAdminAuth();
@@ -102,6 +102,8 @@ export async function POST(req: NextRequest) {
       media_type = "image",
       base64Data,
       isMobile = false,
+      image_url,
+      image_path,
       alt_text,
       title_text,
       subtitle_text,
@@ -207,7 +209,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, slide: restoredSlide, message: "Image précédente restaurée" });
     }
 
-    // Action 4: Téléversement d'une nouvelle image ou remplacement
+    // Action 4: Téléversement d'une nouvelle image
     if (base64Data) {
       const matches = base64Data.match(/^data:(image\/(jpeg|png|webp|avif)|video\/(mp4|webm));base64,(.+)$/);
       if (!matches) {
@@ -245,17 +247,18 @@ export async function POST(req: NextRequest) {
       const publicUrl = publicUrlData.publicUrl;
 
       let existingSlide = null;
-      if (slideId) {
-        const { data } = await supabaseAdmin.from("hero_slides").select("*").eq("id", slideId).single();
+      if (slideId && !slideId.startsWith("temp-")) {
+        const { data } = await supabaseAdmin.from("hero_slides").select("*").eq("id", slideId).maybeSingle();
         existingSlide = data;
-      } else if (position) {
-        const { data } = await supabaseAdmin.from("hero_slides").select("*").eq("position", position).single();
+      }
+      if (!existingSlide && position) {
+        const { data } = await supabaseAdmin.from("hero_slides").select("*").eq("position", position).maybeSingle();
         existingSlide = data;
       }
 
       const slidePayload: any = {
-        media_type: media_type || "image",
         position: position || existingSlide?.position || 1,
+        media_type: media_type || "image",
         alt_text: alt_text || existingSlide?.alt_text || "Image de couverture BRWN",
         title_text: title_text || existingSlide?.title_text || "Le Tiramisu Réinventé",
         subtitle_text: subtitle_text || existingSlide?.subtitle_text || "Le premier tiramisu gastronomique au café de spécialité fait son entrée officielle au menu.",
@@ -285,68 +288,70 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      let resultSlide;
-      if (existingSlide) {
-        const { data, error } = await supabaseAdmin
-          .from("hero_slides")
-          .update(slidePayload)
-          .eq("id", existingSlide.id)
-          .select()
-          .single();
-        if (error) {
-          if (error.message.includes("Could not find the table")) {
-            return NextResponse.json({
-              error: "La table 'public.hero_slides' n'a pas encore été créée dans Supabase."
-            }, { status: 400 });
-          }
-          return NextResponse.json({ error: error.message }, { status: 500 });
-        }
-        resultSlide = data;
-      } else {
-        const { data, error } = await supabaseAdmin
-          .from("hero_slides")
-          .insert(slidePayload)
-          .select()
-          .single();
-        if (error) {
-          if (error.message.includes("Could not find the table")) {
-            return NextResponse.json({
-              error: "La table 'public.hero_slides' n'a pas encore été créée dans Supabase."
-            }, { status: 400 });
-          }
-          return NextResponse.json({ error: error.message }, { status: 500 });
-        }
-        resultSlide = data;
-      }
-
-      return NextResponse.json({ success: true, slide: resultSlide, message: "Image enregistrée avec succès" });
-    }
-
-    // Action 5: Mise à jour simple des métadonnées (titre, sous-titre, texte du bouton, alt, active)
-    if (slideId) {
-      const updatePayload: any = {
-        updated_at: new Date().toISOString(),
-        updated_by: auth.user?.id,
-      };
-      if (alt_text !== undefined) updatePayload.alt_text = alt_text;
-      if (title_text !== undefined) updatePayload.title_text = title_text;
-      if (subtitle_text !== undefined) updatePayload.subtitle_text = subtitle_text;
-      if (button_text !== undefined) updatePayload.button_text = button_text;
-      if (aria_label !== undefined) updatePayload.aria_label = aria_label;
-      if (is_active !== undefined) updatePayload.is_active = is_active;
-      if (crop_data !== undefined) updatePayload.crop_data = crop_data;
-      if (media_type !== undefined) updatePayload.media_type = media_type;
-
-      const { data: updatedSlide, error } = await supabaseAdmin
+      const { data: upsertedSlide, error: upsertError } = await supabaseAdmin
         .from("hero_slides")
-        .update(updatePayload)
-        .eq("id", slideId)
+        .upsert(slidePayload, { onConflict: "position" })
         .select()
         .single();
 
-      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      if (upsertError) {
+        if (upsertError.message.includes("Could not find the table")) {
+          return NextResponse.json({
+            error: "La table 'public.hero_slides' n'a pas encore été créée dans Supabase."
+          }, { status: 400 });
+        }
+        return NextResponse.json({ error: upsertError.message }, { status: 500 });
+      }
 
-      return NextResponse.json({ success: true, slide: updatedSlide, message: "Slide mise à jour" });
+      return NextResponse.json({ success: true, slide: upsertedSlide, message: "Image enregistrée avec succès" });
+    }
+
+    // Action 5: Upsert garanti pour Enregistrer tout ou mettre à jour les textes par position
+    if (position || slideId) {
+      let existingSlide = null;
+      if (slideId && !slideId.startsWith("temp-")) {
+        const { data } = await supabaseAdmin.from("hero_slides").select("*").eq("id", slideId).maybeSingle();
+        existingSlide = data;
+      }
+      if (!existingSlide && position) {
+        const { data } = await supabaseAdmin.from("hero_slides").select("*").eq("position", position).maybeSingle();
+        existingSlide = data;
+      }
+
+      const targetPosition = position || existingSlide?.position || 1;
+
+      const upsertPayload: any = {
+        position: targetPosition,
+        media_type: media_type || existingSlide?.media_type || "image",
+        image_path: image_path || existingSlide?.image_path || "hero_background_default.png",
+        image_url: image_url || existingSlide?.image_url || "/images/hero_background.png",
+        alt_text: alt_text !== undefined ? alt_text : (existingSlide?.alt_text || "Image de couverture BRWN"),
+        title_text: title_text !== undefined ? title_text : (existingSlide?.title_text || "Le Tiramisu Réinventé"),
+        subtitle_text: subtitle_text !== undefined ? subtitle_text : (existingSlide?.subtitle_text || "Le premier tiramisu gastronomique au café de spécialité fait son entrée officielle au menu."),
+        button_text: button_text !== undefined ? button_text : (existingSlide?.button_text || "Commander l'Original"),
+        aria_label: aria_label !== undefined ? aria_label : (existingSlide?.aria_label || "Image du carrousel de couverture BRWN"),
+        is_active: is_active !== undefined ? is_active : (existingSlide?.is_active ?? true),
+        crop_data: crop_data !== undefined ? crop_data : (existingSlide?.crop_data || { zoom: 1, x: 0, y: 0 }),
+        updated_at: new Date().toISOString(),
+        updated_by: auth.user?.id,
+      };
+
+      const { data: savedSlide, error: saveError } = await supabaseAdmin
+        .from("hero_slides")
+        .upsert(upsertPayload, { onConflict: "position" })
+        .select()
+        .single();
+
+      if (saveError) {
+        if (saveError.message.includes("Could not find the table")) {
+          return NextResponse.json({
+            error: "La table 'public.hero_slides' n'a pas encore été créée dans Supabase. Veuillez exécuter le script SQL SETUP_HERO_CAROUSEL.sql dans Supabase."
+          }, { status: 400 });
+        }
+        return NextResponse.json({ error: saveError.message }, { status: 500 });
+      }
+
+      return NextResponse.json({ success: true, slide: savedSlide, message: "Slide sauvegardée avec succès" });
     }
 
     return NextResponse.json({ error: "Requête invalide" }, { status: 400 });

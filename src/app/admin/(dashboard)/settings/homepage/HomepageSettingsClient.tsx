@@ -257,7 +257,7 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
     }
   };
 
-  // Basculer active/inactive
+  // Basculer active/inactive avec sauvegarde garantie par position
   const handleToggleActive = async (index: number) => {
     const target = slides[index];
     const newActive = !target.is_active;
@@ -268,15 +268,31 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
       return copy;
     });
 
-    if (!target.id.startsWith("temp-")) {
-      await fetch("/api/admin/hero-slides", {
+    try {
+      const res = await fetch("/api/admin/hero-slides", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          slideId: target.id,
+          slideId: target.id.startsWith("temp-") ? null : target.id,
+          position: target.position,
           is_active: newActive,
+          image_url: target.image_url,
+          title_text: target.title_text,
+          subtitle_text: target.subtitle_text,
+          button_text: target.button_text,
+          alt_text: target.alt_text,
         }),
       });
+      const data = await res.json();
+      if (data.slide) {
+        setSlides((prev) => {
+          const copy = [...prev];
+          copy[index] = data.slide;
+          return copy;
+        });
+      }
+    } catch {
+      // Échec silencieux
     }
   };
 
@@ -317,25 +333,40 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
     setIsLoading(true);
     try {
       await handleSaveSettings();
-      for (const slide of slides) {
-        if (!slide.id.startsWith("temp-")) {
-          await fetch("/api/admin/hero-slides", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              slideId: slide.id,
-              alt_text: slide.alt_text,
-              title_text: slide.title_text,
-              subtitle_text: slide.subtitle_text,
-              button_text: slide.button_text,
-              aria_label: slide.aria_label,
-              is_active: slide.is_active,
-              crop_data: slide.crop_data,
-            }),
-          });
+      const updatedSlides = [...slides];
+
+      for (let i = 0; i < slides.length; i++) {
+        const slide = slides[i];
+        const res = await fetch("/api/admin/hero-slides", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            slideId: slide.id.startsWith("temp-") ? null : slide.id,
+            position: slide.position,
+            media_type: slide.media_type || "image",
+            image_url: slide.image_url,
+            image_path: slide.image_path,
+            alt_text: slide.alt_text,
+            title_text: slide.title_text,
+            subtitle_text: slide.subtitle_text,
+            button_text: slide.button_text,
+            aria_label: slide.aria_label,
+            is_active: slide.is_active,
+            crop_data: slide.crop_data,
+          }),
+        });
+
+        const data = await res.json();
+        if (!res.ok || data.error) {
+          throw new Error(data.error || `Erreur d'enregistrement pour la position ${slide.position}`);
+        }
+        if (data.slide) {
+          updatedSlides[i] = data.slide;
         }
       }
-      triggerAlert("Tous les titres, sous-titres, boutons et images ont été enregistrés !");
+
+      setSlides(updatedSlides);
+      triggerAlert("Tous les titres, sous-titres, boutons et images ont été enregistrés avec succès dans Supabase !");
     } catch (err: any) {
       triggerAlert(err.message || "Erreur d'enregistrement", true);
     } finally {
