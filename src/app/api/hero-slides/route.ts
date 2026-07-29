@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/utils/supabase/admin";
 
-// Desactiver tout cache Next.js pour que les modifications admin soient instantes sur la page client
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
@@ -35,14 +34,32 @@ export async function GET() {
   try {
     const supabaseAdmin = createAdminClient();
 
-    // 1. Récupération des slides actives en direct
-    const { data: slides, error: slidesError } = await supabaseAdmin
+    // 1. Essai avec toutes les colonnes incluant subtitle_text et button_text
+    let slides: any[] | null = null;
+    let slidesError: any = null;
+
+    const resAll = await supabaseAdmin
       .from("hero_slides")
       .select("id, media_type, image_url, mobile_image_url, alt_text, title_text, subtitle_text, button_text, aria_label, position, crop_data")
       .eq("is_active", true)
       .order("position", { ascending: true });
 
-    // 2. Récupération des paramètres globaux en direct
+    if (resAll.error && resAll.error.message.includes("column")) {
+      // Fallback si les colonnes subtitle_text ou button_text n'ont pas encore été ajoutées à la table
+      const resFallback = await supabaseAdmin
+        .from("hero_slides")
+        .select("id, media_type, image_url, mobile_image_url, alt_text, title_text, aria_label, position, crop_data")
+        .eq("is_active", true)
+        .order("position", { ascending: true });
+
+      slides = resFallback.data;
+      slidesError = resFallback.error;
+    } else {
+      slides = resAll.data;
+      slidesError = resAll.error;
+    }
+
+    // 2. Récupération des paramètres globaux
     const { data: settingsData } = await supabaseAdmin
       .from("hero_settings")
       .select("autoplay_enabled, autoplay_interval_ms, transition_duration_ms")

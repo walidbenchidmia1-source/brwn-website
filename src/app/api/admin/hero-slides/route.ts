@@ -288,18 +288,26 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      const { data: upsertedSlide, error: upsertError } = await supabaseAdmin
+      let { data: upsertedSlide, error: upsertError } = await supabaseAdmin
         .from("hero_slides")
         .upsert(slidePayload, { onConflict: "position" })
         .select()
         .single();
 
+      if (upsertError && upsertError.message.includes("column")) {
+        // Fallback sans subtitle_text et button_text si colonnes pas encore ajoutées
+        delete slidePayload.subtitle_text;
+        delete slidePayload.button_text;
+        const resFb = await supabaseAdmin
+          .from("hero_slides")
+          .upsert(slidePayload, { onConflict: "position" })
+          .select()
+          .single();
+        upsertedSlide = resFb.data;
+        upsertError = resFb.error;
+      }
+
       if (upsertError) {
-        if (upsertError.message.includes("Could not find the table")) {
-          return NextResponse.json({
-            error: "La table 'public.hero_slides' n'a pas encore été créée dans Supabase."
-          }, { status: 400 });
-        }
         return NextResponse.json({ error: upsertError.message }, { status: 500 });
       }
 
@@ -336,18 +344,34 @@ export async function POST(req: NextRequest) {
         updated_by: auth.user?.id,
       };
 
-      const { data: savedSlide, error: saveError } = await supabaseAdmin
+      let { data: savedSlide, error: saveError } = await supabaseAdmin
         .from("hero_slides")
         .upsert(upsertPayload, { onConflict: "position" })
         .select()
         .single();
 
-      if (saveError) {
-        if (saveError.message.includes("Could not find the table")) {
+      if (saveError && saveError.message.includes("column")) {
+        // Fallback si la colonne button_text ou subtitle_text n'est pas encore créée dans Supabase
+        delete upsertPayload.subtitle_text;
+        delete upsertPayload.button_text;
+
+        const resFb = await supabaseAdmin
+          .from("hero_slides")
+          .upsert(upsertPayload, { onConflict: "position" })
+          .select()
+          .single();
+
+        if (!resFb.error) {
           return NextResponse.json({
-            error: "La table 'public.hero_slides' n'a pas encore été créée dans Supabase. Veuillez exécuter le script SQL SETUP_HERO_CAROUSEL.sql dans Supabase."
-          }, { status: 400 });
+            success: true,
+            slide: resFb.data,
+            warning: "Pour enregistrer les sous-titres et boutons personnalisés, veuillez exécuter les 2 lignes SQL d'ajout de colonnes dans Supabase."
+          });
         }
+        saveError = resFb.error;
+      }
+
+      if (saveError) {
         return NextResponse.json({ error: saveError.message }, { status: 500 });
       }
 
