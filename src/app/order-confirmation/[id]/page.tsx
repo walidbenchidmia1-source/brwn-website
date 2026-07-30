@@ -1,9 +1,18 @@
 import React from "react";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createAdminClient } from "@/utils/supabase/admin";
 import { CheckCircle2, ShoppingBag, MapPin, Calendar, Clock, CreditCard, Receipt } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Confirmation de Commande | BRWN",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 interface PageProps {
   params: Promise<{ id: string }>;
