@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createAdminClient } from "@/utils/supabase/admin";
+import { createClient } from "@/utils/supabase/server";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -32,17 +32,17 @@ const NO_CACHE_HEADERS = {
 
 export async function GET() {
   try {
-    const supabaseAdmin = createAdminClient();
+    const supabase = await createClient();
 
-    // Récupération des slides actives avec toutes les colonnes
-    const { data: slides, error: slidesError } = await supabaseAdmin
+    // Récupération des slides actives avec toutes les colonnes via le client standard RLS
+    const { data: slides, error: slidesError } = await supabase
       .from("hero_slides")
       .select("id, media_type, image_url, mobile_image_url, alt_text, title_text, subtitle_text, button_text, aria_label, position, crop_data")
       .eq("is_active", true)
       .order("position", { ascending: true });
 
     // Récupération des paramètres globaux
-    const { data: settingsData } = await supabaseAdmin
+    const { data: settingsData } = await supabase
       .from("hero_settings")
       .select("autoplay_enabled, autoplay_interval_ms, transition_duration_ms")
       .eq("id", "global")

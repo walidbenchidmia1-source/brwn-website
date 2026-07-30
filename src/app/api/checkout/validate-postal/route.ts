@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createAdminClient } from "@/utils/supabase/admin";
+import { createClient } from "@/utils/supabase/server";
 
 export async function GET(req: Request) {
   try {
@@ -16,7 +16,7 @@ export async function GET(req: Request) {
     }
 
     const prefix = normalized.substring(0, 3);
-    const supabase = createAdminClient();
+    const supabase = await createClient();
 
     const { data: zones, error } = await supabase
       .from("delivery_zones")

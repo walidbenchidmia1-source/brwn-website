@@ -1,6 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { getFormatPriceCents } from "@/utils/pricing";
+export { getFormatPriceCents };
 
 export interface CartItem {
   productId: string;
@@ -27,17 +29,6 @@ interface CartContextType {
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
-
-export const getFormatPriceCents = (basePriceCents: number, format: string): number => {
-  const normalizedFormat = format.trim().toLowerCase();
-  if (normalizedFormat === "le duo" || normalizedFormat === "duo") {
-    return Math.round(basePriceCents * 1.8);
-  }
-  if (normalizedFormat === "le deluxe box" || normalizedFormat === "deluxe box" || normalizedFormat === "le deluxe") {
-    return Math.round(basePriceCents * 3.2);
-  }
-  return basePriceCents; // Default is "Le Solo"
-};
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);

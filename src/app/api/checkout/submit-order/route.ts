@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/utils/supabase/admin";
 import Stripe from "stripe";
 import { z } from "zod";
+import { getFormatPriceCents } from "@/utils/pricing";
 
 // Zod Validation Schema
 const submitOrderSchema = z.object({
@@ -32,14 +33,6 @@ const submitOrderSchema = z.object({
     })
   ).min(1),
 });
-
-// Price multiplier function based on format
-const getFormatPriceCents = (basePriceCents: number, format: string): number => {
-  const norm = format.trim().toLowerCase();
-  if (norm === "le duo" || norm === "duo") return Math.round(basePriceCents * 1.8);
-  if (norm === "le deluxe box" || norm === "deluxe box" || norm === "le deluxe") return Math.round(basePriceCents * 3.2);
-  return basePriceCents;
-};
 
 export async function POST(req: Request) {
   try {
@@ -99,7 +92,7 @@ export async function POST(req: Request) {
       if (val.paymentMethod === "stripe" && existingOrder.stripe_payment_intent_id) {
         const stripeKey = process.env.STRIPE_SECRET_KEY;
         if (stripeKey) {
-          const stripe = new Stripe(stripeKey, { apiVersion: "2022-11-15" as any });
+          const stripe = new Stripe(stripeKey);
           const pi = await stripe.paymentIntents.retrieve(existingOrder.stripe_payment_intent_id);
           clientSecret = pi.client_secret;
         }
@@ -455,7 +448,7 @@ export async function POST(req: Request) {
       }
 
       try {
-        const stripe = new Stripe(stripeKey, { apiVersion: "2022-11-15" as any });
+        const stripe = new Stripe(stripeKey);
         const paymentIntent = await stripe.paymentIntents.create(
           {
             amount: totalCents,
