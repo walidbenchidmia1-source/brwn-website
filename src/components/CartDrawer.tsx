@@ -96,6 +96,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                         alt={item.name}
                         fill
                         sizes="80px"
+                        quality={80}
                         className="object-contain"
                       />
                     </div>

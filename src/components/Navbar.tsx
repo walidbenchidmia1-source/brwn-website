@@ -69,6 +69,8 @@ export default function Navbar() {
               src="/images/logo_brwn.png"
               alt="BRWN Logo"
               fill
+              sizes="(max-width: 768px) 220px, 320px"
+              quality={85}
               className="object-contain"
               priority
             />

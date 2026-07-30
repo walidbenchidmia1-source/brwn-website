@@ -90,16 +90,17 @@ export default function OrderSection() {
                 alt="BRWN Deluxe Packaging"
                 fill
                 sizes="(max-width: 640px) 320px, 450px"
+                quality={85}
                 className="object-contain filter drop-shadow-2xl"
               />
             </div>
             
             {/* Small floating coffee beans for context */}
             <div className="absolute top-[10%] right-[10%] w-10 h-10 pointer-events-none z-20 opacity-60">
-              <Image src="/images/coffee_bean.png" alt="Coffee bean" fill className="object-contain rotate-12" />
+              <Image src="/images/coffee_bean.png" alt="Coffee bean" fill sizes="40px" quality={80} className="object-contain rotate-12" />
             </div>
             <div className="absolute bottom-[15%] left-[5%] w-12 h-12 pointer-events-none z-20 opacity-60">
-              <Image src="/images/coffee_bean.png" alt="Coffee bean" fill className="object-contain -rotate-[45deg]" />
+              <Image src="/images/coffee_bean.png" alt="Coffee bean" fill sizes="48px" quality={80} className="object-contain -rotate-[45deg]" />
             </div>
           </div>
 
