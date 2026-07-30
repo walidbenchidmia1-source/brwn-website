@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/utils/supabase/admin";
-import fs from "fs";
-import path from "path";
 
 export async function GET(req: Request) {
   try {
@@ -18,7 +16,17 @@ export async function GET(req: Request) {
 
     console.log(`Worker ${workerId} starting processing of email jobs...`);
 
-    // 2. Fetch and lock up to 10 jobs using skip locked RPC
+    // 2. Fetch store settings for dynamic pickup address
+    const { data: storeSettings } = await supabase
+      .from("store_settings")
+      .select("pickup_address, pickup_instructions")
+      .eq("id", "global")
+      .maybeSingle();
+
+    const pickupAddress = storeSettings?.pickup_address || "Adresse de cueillette — voir votre confirmation de commande";
+    const pickupInstructions = storeSettings?.pickup_instructions || "Veuillez vous présenter au comptoir avec votre numéro de commande.";
+
+    // 3. Fetch and lock up to 10 jobs using skip locked RPC
     const { data: lockedJobs, error: lockErr } = await supabase.rpc(
       "lock_next_email_jobs",
       {
@@ -73,7 +81,7 @@ export async function GET(req: Request) {
           day: "numeric",
         });
 
-        // 3. Generate HTML & Subject based on email type
+        // 4. Generate HTML & Subject based on email type
         const emailSubject = job.email_type === "admin_notification"
           ? `🚨 Nouvelle commande reçue : ${order.order_number}`
           : `Confirmation de votre commande ${order.order_number} - BRWN`;
@@ -94,6 +102,10 @@ export async function GET(req: Request) {
              <p>Une nouvelle commande a été passée par <strong>${order.customer_first_name} ${order.customer_last_name}</strong> (${order.customer_email}).</p>`
           : `<p>Bonjour <strong>${order.customer_first_name} ${order.customer_last_name}</strong>,</p>
              <p>Merci pour votre confiance ! Nous avons bien enregistré votre commande <strong>${order.order_number}</strong>.</p>`;
+
+        // Pickup address: always use dynamic value from store_settings
+        const pickupLocationLine = `Lieu : ${pickupAddress}`;
+        const pickupInstructionsLine = pickupInstructions ? `<br>${pickupInstructions}` : "";
 
         const html = `
 <!DOCTYPE html>
@@ -132,7 +144,10 @@ export async function GET(req: Request) {
       <div class="section-title">Mode et créneau</div>
       <strong>${order.fulfillment_type === "delivery" ? "Livraison à domicile" : "Cueillette sur place"}</strong><br>
       Date : ${formattedDate}<br>
-      ${order.fulfillment_type === "delivery" ? `Adresse : ${order.delivery_address} ${order.delivery_apartment || ""}, ${order.delivery_city}, ${order.delivery_postal_code}` : "Lieu : 123 Rue de Tiramisu, Montréal, QC"}<br>
+      ${order.fulfillment_type === "delivery"
+        ? `Adresse : ${order.delivery_address} ${order.delivery_apartment || ""}, ${order.delivery_city}, ${order.delivery_postal_code}`
+        : `${pickupLocationLine}${pickupInstructionsLine}`
+      }<br>
       ${order.delivery_instructions ? `Instructions livraison : ${order.delivery_instructions}<br>` : ""}
       ${order.order_notes ? `Note de commande : ${order.order_notes}<br>` : ""}
       <br>
@@ -205,18 +220,7 @@ export async function GET(req: Request) {
 </html>
         `;
 
-        // 4. Save email HTML file locally (acts as concrete proof of receipt creation)
-        const emailsDir = path.join("C:", "Users", "ipado", ".gemini", "antigravity", "brain", "5464f3f8-6c2e-43fb-b365-f28e82ad35a2", "scratch", "emails");
-
-        if (!fs.existsSync(emailsDir)) {
-          fs.mkdirSync(emailsDir, { recursive: true });
-        }
-
-        const emailPath = path.join(emailsDir, `order-${order.order_number}-${job.email_type}.html`);
-        fs.writeFileSync(emailPath, html, "utf-8");
-        console.log(`Email receipt written successfully to: ${emailPath}`);
-
-        // 5. Send actual email if Resend API Key is configured
+        // 5. Send actual email via Resend if API Key is configured
         const resendApiKey = process.env.RESEND_API_KEY;
         if (resendApiKey) {
           console.log(`Sending email job ${job.id} via Resend...`);
@@ -242,7 +246,8 @@ export async function GET(req: Request) {
           const resendData = await resendResponse.json();
           console.log(`Resend send email success! ID: ${resendData.id}`);
         } else {
-          console.log(`[Simulation Mode] No RESEND_API_KEY environment variable found. Email job logged to: ${emailPath}`);
+          // Simulation mode: log the email content without writing to disk (Vercel filesystem is read-only)
+          console.log(`[Simulation Mode] RESEND_API_KEY not set. Email would be sent to: ${job.recipient} | Subject: ${emailSubject} | Order: ${order.order_number}`);
         }
 
         // 6. Update job to success in DB
@@ -274,7 +279,7 @@ export async function GET(req: Request) {
         console.error(`Failed to process email job ${job.id}:`, err);
 
         const nextAttemptCount = job.attempt_count + 1;
-        const nextAttemptAt = new Date(Date.now() + nextAttemptCount * 2 * 60000).toISOString(); // progress delay: 2, 4, 6...
+        const nextAttemptAt = new Date(Date.now() + nextAttemptCount * 2 * 60000).toISOString(); // progressive delay: 2, 4, 6...
 
         const finalStatus = nextAttemptCount >= 5 ? "dead" : "failed";
 

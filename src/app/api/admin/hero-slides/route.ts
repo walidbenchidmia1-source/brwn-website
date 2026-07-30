@@ -288,24 +288,11 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      let { data: upsertedSlide, error: upsertError } = await supabaseAdmin
+      const { data: upsertedSlide, error: upsertError } = await supabaseAdmin
         .from("hero_slides")
         .upsert(slidePayload, { onConflict: "position" })
         .select()
         .single();
-
-      if (upsertError && upsertError.message.includes("column")) {
-        // Fallback sans subtitle_text et button_text si colonnes pas encore ajoutées
-        delete slidePayload.subtitle_text;
-        delete slidePayload.button_text;
-        const resFb = await supabaseAdmin
-          .from("hero_slides")
-          .upsert(slidePayload, { onConflict: "position" })
-          .select()
-          .single();
-        upsertedSlide = resFb.data;
-        upsertError = resFb.error;
-      }
 
       if (upsertError) {
         return NextResponse.json({ error: upsertError.message }, { status: 500 });
@@ -344,32 +331,11 @@ export async function POST(req: NextRequest) {
         updated_by: auth.user?.id,
       };
 
-      let { data: savedSlide, error: saveError } = await supabaseAdmin
+      const { data: savedSlide, error: saveError } = await supabaseAdmin
         .from("hero_slides")
         .upsert(upsertPayload, { onConflict: "position" })
         .select()
         .single();
-
-      if (saveError && saveError.message.includes("column")) {
-        // Fallback si la colonne button_text ou subtitle_text n'est pas encore créée dans Supabase
-        delete upsertPayload.subtitle_text;
-        delete upsertPayload.button_text;
-
-        const resFb = await supabaseAdmin
-          .from("hero_slides")
-          .upsert(upsertPayload, { onConflict: "position" })
-          .select()
-          .single();
-
-        if (!resFb.error) {
-          return NextResponse.json({
-            success: true,
-            slide: resFb.data,
-            warning: "Pour enregistrer les sous-titres et boutons personnalisés, veuillez exécuter les 2 lignes SQL d'ajout de colonnes dans Supabase."
-          });
-        }
-        saveError = resFb.error;
-      }
 
       if (saveError) {
         return NextResponse.json({ error: saveError.message }, { status: 500 });

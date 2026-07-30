@@ -12,23 +12,11 @@ async function getHeroData() {
   try {
     const supabaseAdmin = createAdminClient();
 
-    let slides: any[] | null = null;
-    const resAll = await supabaseAdmin
+    const { data: slides } = await supabaseAdmin
       .from("hero_slides")
       .select("id, media_type, image_url, mobile_image_url, alt_text, title_text, subtitle_text, button_text, aria_label, position, crop_data")
       .eq("is_active", true)
       .order("position", { ascending: true });
-
-    if (resAll.error && resAll.error.message.includes("column")) {
-      const resFallback = await supabaseAdmin
-        .from("hero_slides")
-        .select("id, media_type, image_url, mobile_image_url, alt_text, title_text, aria_label, position, crop_data")
-        .eq("is_active", true)
-        .order("position", { ascending: true });
-      slides = resFallback.data;
-    } else {
-      slides = resAll.data;
-    }
 
     const { data: settings } = await supabaseAdmin
       .from("hero_settings")
