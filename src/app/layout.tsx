@@ -54,11 +54,11 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/icon.svg?v=3", type: "image/svg+xml" },
-      { url: "/icon.png?v=3", type: "image/png" },
+      { url: "/icon.svg?v=4", type: "image/svg+xml" },
+      { url: "/icon.png?v=4", type: "image/png" },
     ],
-    shortcut: "/icon.svg?v=3",
-    apple: "/apple-icon.png?v=3",
+    shortcut: "/icon.svg?v=4",
+    apple: "/apple-icon.png?v=4",
   },
 };
 
