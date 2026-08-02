@@ -52,6 +52,11 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  icons: {
+    icon: "/images/logo_brwn.png",
+    shortcut: "/images/logo_brwn.png",
+    apple: "/images/logo_brwn.png",
+  },
 };
 
 export default function RootLayout({
