@@ -53,9 +53,12 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: "/images/logo_brwn.png",
-    shortcut: "/images/logo_brwn.png",
-    apple: "/images/logo_brwn.png",
+    icon: [
+      { url: "/icon.svg?v=2", type: "image/svg+xml" },
+      { url: "/icon.png?v=2", type: "image/png" },
+    ],
+    shortcut: "/icon.svg?v=2",
+    apple: "/apple-icon.png?v=2",
   },
 };
 

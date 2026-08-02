@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <rect width="512" height="512" rx="128" fill="#3D2216" />
+  <!-- Coffee bean element -->
+  <g transform="translate(256, 195) scale(2.6)" fill="none" stroke="#C4A484" stroke-width="6" stroke-linecap="round">
+    <ellipse cx="0" cy="0" rx="22" ry="30" fill="#3D2216" stroke="#C4A484" stroke-width="7" transform="rotate(-25)"/>
+    <path d="M-9,-22 C-2,-8 2,8 9,22" stroke="#C4A484" stroke-width="6" transform="rotate(-25)"/>
+  </g>
+  <!-- BRWN text -->
+  <text x="50%" y="380" dominant-baseline="middle" text-anchor="middle" fill="#F9F6F0" font-family="system-ui, -apple-system, 'Archivo', 'Arial Black', sans-serif" font-weight="900" font-size="105" letter-spacing="8">BRWN</text>
+</svg>
