@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, X, Check, Coffee, Shell, Leaf, Flame, Star, Sparkles, ShoppingBag } from "lucide-react";
+import { ArrowRight, X, Check, Coffee, Shell, Leaf, Flame, Star, Sparkles, Heart, Loader, ShoppingBag } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useCart } from "@/context/CartContext";
 
