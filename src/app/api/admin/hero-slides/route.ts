@@ -288,6 +288,8 @@ export async function POST(req: NextRequest) {
       if (isMobile) {
         slidePayload.mobile_image_path = filePath;
         slidePayload.mobile_image_url = publicUrl;
+        slidePayload.image_path = existingSlide?.image_path || filePath;
+        slidePayload.image_url = existingSlide?.image_url || publicUrl;
         if (existingSlide?.mobile_image_url) {
           slidePayload.previous_mobile_image_url = existingSlide.mobile_image_url;
           slidePayload.previous_mobile_image_path = existingSlide.mobile_image_path;
@@ -365,10 +367,10 @@ export async function POST(req: NextRequest) {
       const upsertPayload: any = {
         position: targetPosition,
         media_type: media_type || existingSlide?.media_type || "image",
-        image_path: image_path !== undefined ? image_path : (existingSlide?.image_path || "hero_background_default.png"),
-        image_url: image_url !== undefined ? image_url : (existingSlide?.image_url || "/images/hero_background.png"),
-        mobile_image_path: mobile_image_path !== undefined ? mobile_image_path : (existingSlide?.mobile_image_path || null),
-        mobile_image_url: mobile_image_url !== undefined ? mobile_image_url : (existingSlide?.mobile_image_url || null),
+        image_path: (image_path && image_path !== "") ? image_path : (existingSlide?.image_path || "hero_background_default.png"),
+        image_url: (image_url && image_url !== "") ? image_url : (existingSlide?.image_url || "/images/hero_background.png"),
+        mobile_image_path: mobile_image_path || existingSlide?.mobile_image_path || null,
+        mobile_image_url: mobile_image_url || existingSlide?.mobile_image_url || null,
         alt_text: alt_text !== undefined ? alt_text : (existingSlide?.alt_text || "Image de couverture BRWN"),
         title_text: title_text !== undefined ? title_text : (existingSlide?.title_text || "Le Tiramisu Réinventé"),
         subtitle_text: subtitle_text !== undefined ? subtitle_text : (existingSlide?.subtitle_text || "Le premier tiramisu gastronomique au café de spécialité fait son entrée officielle au menu."),
