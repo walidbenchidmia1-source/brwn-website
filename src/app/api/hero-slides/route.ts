@@ -65,7 +65,13 @@ export async function GET() {
 
     const heroSettings = settingsData || DEFAULT_SETTINGS;
 
-    if (slidesError || !slides || slides.length === 0) {
+    const normalizedSlides = (slides || []).map((s) => ({
+      ...s,
+      show_title: s.crop_data?.show_title ?? s.show_title ?? true,
+      show_subtitle: s.crop_data?.show_subtitle ?? s.show_subtitle ?? true,
+    }));
+
+    if (!slides || slides.length === 0) {
       return NextResponse.json(
         { slides: [DEFAULT_SLIDE], settings: heroSettings },
         { headers: NO_CACHE_HEADERS }
@@ -73,7 +79,7 @@ export async function GET() {
     }
 
     return NextResponse.json(
-      { slides, settings: heroSettings },
+      { slides: normalizedSlides, settings: heroSettings },
       { headers: NO_CACHE_HEADERS }
     );
   } catch {

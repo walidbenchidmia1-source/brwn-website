@@ -258,6 +258,12 @@ export async function POST(req: NextRequest) {
         existingSlide = data;
       }
 
+      const finalCropData = {
+        ...(crop_data || existingSlide?.crop_data || { zoom: 1, x: 0, y: 0 }),
+        show_title: show_title !== undefined ? show_title : (existingSlide?.crop_data?.show_title ?? existingSlide?.show_title ?? true),
+        show_subtitle: show_subtitle !== undefined ? show_subtitle : (existingSlide?.crop_data?.show_subtitle ?? existingSlide?.show_subtitle ?? true),
+      };
+
       const slidePayload: any = {
         position: position || existingSlide?.position || 1,
         media_type: media_type || "image",
@@ -267,11 +273,11 @@ export async function POST(req: NextRequest) {
         button_text: button_text || existingSlide?.button_text || "Commander l'Original",
         aria_label: aria_label || existingSlide?.aria_label || "Image du carrousel de couverture BRWN",
         is_active: is_active !== undefined ? is_active : (existingSlide?.is_active ?? true),
-        show_title: show_title !== undefined ? show_title : (existingSlide?.show_title ?? true),
-        show_subtitle: show_subtitle !== undefined ? show_subtitle : (existingSlide?.show_subtitle ?? true),
+        show_title: finalCropData.show_title,
+        show_subtitle: finalCropData.show_subtitle,
         file_size_bytes: buffer.length,
         file_format: extension,
-        crop_data: crop_data || existingSlide?.crop_data || { zoom: 1, x: 0, y: 0 },
+        crop_data: finalCropData,
         updated_at: new Date().toISOString(),
         updated_by: auth.user?.id,
       };
@@ -298,6 +304,8 @@ export async function POST(req: NextRequest) {
         .select()
         .single();
 
+      let returnSlide = upsertedSlide;
+
       if (upsertError) {
         if (upsertError.message.includes("Could not find") || upsertError.message.includes("column")) {
           delete slidePayload.show_title;
@@ -308,13 +316,22 @@ export async function POST(req: NextRequest) {
             .select()
             .single();
           if (!retryErr) {
-            return NextResponse.json({ success: true, slide: retrySlide, message: "Image enregistrée avec succès" });
+            returnSlide = retrySlide;
+          } else {
+            return NextResponse.json({ error: retryErr.message }, { status: 500 });
           }
+        } else {
+          return NextResponse.json({ error: upsertError.message }, { status: 500 });
         }
-        return NextResponse.json({ error: upsertError.message }, { status: 500 });
       }
 
-      return NextResponse.json({ success: true, slide: upsertedSlide, message: "Image enregistrée avec succès" });
+      const normalizedUploadSlide = {
+        ...returnSlide,
+        show_title: finalCropData.show_title,
+        show_subtitle: finalCropData.show_subtitle,
+      };
+
+      return NextResponse.json({ success: true, slide: normalizedUploadSlide, message: "Image enregistrée avec succès" });
     }
 
     // Action 5: Upsert garanti pour Enregistrer tout ou mettre à jour les textes par position
@@ -331,6 +348,12 @@ export async function POST(req: NextRequest) {
 
       const targetPosition = position || existingSlide?.position || 1;
 
+      const finalCropData = {
+        ...(crop_data !== undefined ? crop_data : (existingSlide?.crop_data || { zoom: 1, x: 0, y: 0 })),
+        show_title: show_title !== undefined ? show_title : (existingSlide?.crop_data?.show_title ?? existingSlide?.show_title ?? true),
+        show_subtitle: show_subtitle !== undefined ? show_subtitle : (existingSlide?.crop_data?.show_subtitle ?? existingSlide?.show_subtitle ?? true),
+      };
+
       const upsertPayload: any = {
         position: targetPosition,
         media_type: media_type || existingSlide?.media_type || "image",
@@ -342,9 +365,9 @@ export async function POST(req: NextRequest) {
         button_text: button_text !== undefined ? button_text : (existingSlide?.button_text || "Commander l'Original"),
         aria_label: aria_label !== undefined ? aria_label : (existingSlide?.aria_label || "Image du carrousel de couverture BRWN"),
         is_active: is_active !== undefined ? is_active : (existingSlide?.is_active ?? true),
-        show_title: show_title !== undefined ? show_title : (existingSlide?.show_title ?? true),
-        show_subtitle: show_subtitle !== undefined ? show_subtitle : (existingSlide?.show_subtitle ?? true),
-        crop_data: crop_data !== undefined ? crop_data : (existingSlide?.crop_data || { zoom: 1, x: 0, y: 0 }),
+        show_title: finalCropData.show_title,
+        show_subtitle: finalCropData.show_subtitle,
+        crop_data: finalCropData,
         updated_at: new Date().toISOString(),
         updated_by: auth.user?.id,
       };
@@ -354,6 +377,8 @@ export async function POST(req: NextRequest) {
         .upsert(upsertPayload, { onConflict: "position" })
         .select()
         .single();
+
+      let returnSaveSlide = savedSlide;
 
       if (saveError) {
         if (saveError.message.includes("Could not find") || saveError.message.includes("column")) {
@@ -365,13 +390,22 @@ export async function POST(req: NextRequest) {
             .select()
             .single();
           if (!retrySaveErr) {
-            return NextResponse.json({ success: true, slide: retrySavedSlide, message: "Slide sauvegardée avec succès" });
+            returnSaveSlide = retrySavedSlide;
+          } else {
+            return NextResponse.json({ error: retrySaveErr.message }, { status: 500 });
           }
+        } else {
+          return NextResponse.json({ error: saveError.message }, { status: 500 });
         }
-        return NextResponse.json({ error: saveError.message }, { status: 500 });
       }
 
-      return NextResponse.json({ success: true, slide: savedSlide, message: "Slide sauvegardée avec succès" });
+      const normalizedSaveSlide = {
+        ...returnSaveSlide,
+        show_title: finalCropData.show_title,
+        show_subtitle: finalCropData.show_subtitle,
+      };
+
+      return NextResponse.json({ success: true, slide: normalizedSaveSlide, message: "Slide sauvegardée avec succès" });
     }
 
     return NextResponse.json({ error: "Requête invalide" }, { status: 400 });

@@ -36,8 +36,14 @@ async function getHeroData() {
       .eq("id", "global")
       .maybeSingle();
 
+    const normalizedSlides = (slides || []).map((s) => ({
+      ...s,
+      show_title: s.crop_data?.show_title ?? s.show_title ?? true,
+      show_subtitle: s.crop_data?.show_subtitle ?? s.show_subtitle ?? true,
+    }));
+
     return {
-      slides: slides && slides.length > 0 ? slides : undefined,
+      slides: normalizedSlides.length > 0 ? normalizedSlides : undefined,
       settings: settings || undefined,
     };
   } catch {

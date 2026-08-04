@@ -17,7 +17,7 @@ interface HeroSlide {
   button_text?: string | null;
   aria_label?: string | null;
   position: number;
-  crop_data?: { zoom: number; x: number; y: number } | null;
+  crop_data?: { zoom?: number; x?: number; y?: number; show_title?: boolean; show_subtitle?: boolean; [key: string]: any } | null;
   show_title?: boolean;
   show_subtitle?: boolean;
 }
@@ -359,12 +359,15 @@ export default function Hero({ initialSlides, initialSettings }: HeroProps) {
       {/* Central Content (Modifiable depuis le Dashboard Admin) */}
       {(() => {
         const currentSlide = slides[currentIndex % slides.length] || slides[0];
+        const isTitleVisible = (currentSlide?.crop_data?.show_title ?? currentSlide?.show_title) !== false;
+        const isSubtitleVisible = (currentSlide?.crop_data?.show_subtitle ?? currentSlide?.show_subtitle) !== false;
+
         return (
           <div
             ref={contentRef}
             className="relative max-w-4xl w-full flex flex-col items-center text-center z-20 px-4 gap-4 md:gap-0"
           >
-            {currentSlide?.show_title !== false && (
+            {isTitleVisible && (
               <h1
                 ref={titleRef}
                 className="font-sans font-extrabold text-[#150B07] text-3xl sm:text-5xl md:text-[4.5vw] tracking-tighter leading-[1.15] uppercase transition-all duration-500"
@@ -373,7 +376,7 @@ export default function Hero({ initialSlides, initialSettings }: HeroProps) {
               </h1>
             )}
 
-            {currentSlide?.show_subtitle !== false && (
+            {isSubtitleVisible && (
               <p
                 ref={subtitleRef}
                 className="font-sans text-[#3D2216]/80 text-sm sm:text-lg md:text-xl font-light tracking-wide max-w-xl sm:max-w-2xl mt-0 md:mt-6 leading-relaxed transition-all duration-500"

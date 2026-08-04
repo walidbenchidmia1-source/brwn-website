@@ -49,7 +49,7 @@ interface HeroSlide {
   is_active: boolean;
   file_size_bytes?: number | null;
   file_format?: string | null;
-  crop_data?: { zoom: number; x: number; y: number } | null;
+  crop_data?: { zoom?: number; x?: number; y?: number; show_title?: boolean; show_subtitle?: boolean; [key: string]: any } | null;
   show_title?: boolean;
   show_subtitle?: boolean;
 }
@@ -304,7 +304,16 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
   const handleMetadataChange = (index: number, field: string, value: any) => {
     setSlides((prev) => {
       const copy = [...prev];
-      copy[index] = { ...copy[index], [field]: value };
+      const currentSlide = copy[index];
+      const updatedCropData = {
+        ...(currentSlide.crop_data || { zoom: 1, x: 0, y: 0 }),
+        ...(field === "show_title" || field === "show_subtitle" ? { [field]: value } : {}),
+      };
+      copy[index] = {
+        ...currentSlide,
+        [field]: value,
+        crop_data: updatedCropData,
+      };
       return copy;
     });
   };
@@ -715,103 +724,109 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
               )}
 
               {/* SECTION EDITABLE DES TEXTES HERO (TITRE, SOUS-TITRE, BOUTON) */}
-              <div className="space-y-3">
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-[#3D2216] flex items-center gap-1">
-                      <Type className="w-3 h-3 text-[#D97706]" />
-                      Titre Principal (H1)
-                    </label>
-                    <label className="flex items-center gap-1.5 cursor-pointer select-none">
+              {(() => {
+                const isTitleVisible = (slide.crop_data?.show_title ?? slide.show_title) !== false;
+                const isSubtitleVisible = (slide.crop_data?.show_subtitle ?? slide.show_subtitle) !== false;
+                return (
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-[#3D2216] flex items-center gap-1">
+                          <Type className="w-3 h-3 text-[#D97706]" />
+                          Titre Principal (H1)
+                        </label>
+                        <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            checked={isTitleVisible}
+                            onChange={(e) => handleMetadataChange(idx, "show_title", e.target.checked)}
+                            className="w-3.5 h-3.5 accent-[#3D2216] cursor-pointer rounded"
+                          />
+                          <span className={`text-[10px] font-bold uppercase tracking-wider ${isTitleVisible ? "text-[#3D2216]" : "text-[#C83E4D]"}`}>
+                            {isTitleVisible ? "Affiché" : "Masqué"}
+                          </span>
+                        </label>
+                      </div>
                       <input
-                        type="checkbox"
-                        checked={slide.show_title !== false}
-                        onChange={(e) => handleMetadataChange(idx, "show_title", e.target.checked)}
-                        className="w-3.5 h-3.5 accent-[#3D2216] cursor-pointer rounded"
+                        type="text"
+                        value={slide.title_text || ""}
+                        onChange={(e) => handleMetadataChange(idx, "title_text", e.target.value)}
+                        placeholder="Le Tiramisu Réinventé..."
+                        disabled={!isTitleVisible}
+                        className={`w-full text-xs p-2.5 bg-[#FAF7F2] border border-[#3D2216]/10 rounded-xl focus:border-[#C4A484] outline-none font-bold ${
+                          !isTitleVisible ? "opacity-40 bg-gray-100 cursor-not-allowed" : ""
+                        }`}
                       />
-                      <span className={`text-[10px] font-bold uppercase tracking-wider ${slide.show_title !== false ? "text-[#3D2216]" : "text-[#C83E4D]"}`}>
-                        {slide.show_title !== false ? "Affiché" : "Masqué"}
-                      </span>
-                    </label>
-                  </div>
-                  <input
-                    type="text"
-                    value={slide.title_text || ""}
-                    onChange={(e) => handleMetadataChange(idx, "title_text", e.target.value)}
-                    placeholder="Le Tiramisu Réinventé..."
-                    disabled={slide.show_title === false}
-                    className={`w-full text-xs p-2.5 bg-[#FAF7F2] border border-[#3D2216]/10 rounded-xl focus:border-[#C4A484] outline-none font-bold ${
-                      slide.show_title === false ? "opacity-40 bg-gray-100 cursor-not-allowed" : ""
-                    }`}
-                  />
-                  {slide.show_title === false && (
-                    <span className="text-[9px] text-[#C83E4D] font-bold uppercase tracking-wider mt-1 block">
-                      ⚠️ Le titre H1 sera masqué sur le site pour cette slide.
-                    </span>
-                  )}
-                </div>
+                      {!isTitleVisible && (
+                        <span className="text-[9px] text-[#C83E4D] font-bold uppercase tracking-wider mt-1 block">
+                          ⚠️ Le titre H1 sera masqué sur le site pour cette slide.
+                        </span>
+                      )}
+                    </div>
 
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-[#3D2216] flex items-center gap-1">
-                      <AlignLeft className="w-3 h-3 text-[#D97706]" />
-                      Sous-titre / Description
-                    </label>
-                    <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-[#3D2216] flex items-center gap-1">
+                          <AlignLeft className="w-3 h-3 text-[#D97706]" />
+                          Sous-titre / Description
+                        </label>
+                        <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            checked={isSubtitleVisible}
+                            onChange={(e) => handleMetadataChange(idx, "show_subtitle", e.target.checked)}
+                            className="w-3.5 h-3.5 accent-[#3D2216] cursor-pointer rounded"
+                          />
+                          <span className={`text-[10px] font-bold uppercase tracking-wider ${isSubtitleVisible ? "text-[#3D2216]" : "text-[#C83E4D]"}`}>
+                            {isSubtitleVisible ? "Affiché" : "Masqué"}
+                          </span>
+                        </label>
+                      </div>
+                      <textarea
+                        rows={2}
+                        value={slide.subtitle_text || ""}
+                        onChange={(e) => handleMetadataChange(idx, "subtitle_text", e.target.value)}
+                        placeholder="Le premier tiramisu gastronomique au café de spécialité..."
+                        disabled={!isSubtitleVisible}
+                        className={`w-full text-xs p-2.5 bg-[#FAF7F2] border border-[#3D2216]/10 rounded-xl focus:border-[#C4A484] outline-none resize-none ${
+                          !isSubtitleVisible ? "opacity-40 bg-gray-100 cursor-not-allowed" : ""
+                        }`}
+                      />
+                      {!isSubtitleVisible && (
+                        <span className="text-[9px] text-[#C83E4D] font-bold uppercase tracking-wider mt-1 block">
+                          ⚠️ Le sous-titre sera masqué sur le site pour cette slide.
+                        </span>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3D2216] mb-1">
+                        Texte du Bouton CTA
+                      </label>
                       <input
-                        type="checkbox"
-                        checked={slide.show_subtitle !== false}
-                        onChange={(e) => handleMetadataChange(idx, "show_subtitle", e.target.checked)}
-                        className="w-3.5 h-3.5 accent-[#3D2216] cursor-pointer rounded"
+                        type="text"
+                        value={slide.button_text || ""}
+                        onChange={(e) => handleMetadataChange(idx, "button_text", e.target.value)}
+                        placeholder="Commander l'Original..."
+                        className="w-full text-xs p-2.5 bg-[#FAF7F2] border border-[#3D2216]/10 rounded-xl focus:border-[#C4A484] outline-none"
                       />
-                      <span className={`text-[10px] font-bold uppercase tracking-wider ${slide.show_subtitle !== false ? "text-[#3D2216]" : "text-[#C83E4D]"}`}>
-                        {slide.show_subtitle !== false ? "Affiché" : "Masqué"}
-                      </span>
-                    </label>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3D2216]/70 mb-1">
+                        Texte alternatif (ALT SEO)
+                      </label>
+                      <input
+                        type="text"
+                        value={slide.alt_text || ""}
+                        onChange={(e) => handleMetadataChange(idx, "alt_text", e.target.value)}
+                        placeholder="Description pour l'accessibilité..."
+                        className="w-full text-xs p-2.5 bg-[#FAF7F2] border border-[#3D2216]/10 rounded-xl focus:border-[#C4A484] outline-none text-[#3D2216]/80"
+                      />
+                    </div>
                   </div>
-                  <textarea
-                    rows={2}
-                    value={slide.subtitle_text || ""}
-                    onChange={(e) => handleMetadataChange(idx, "subtitle_text", e.target.value)}
-                    placeholder="Le premier tiramisu gastronomique au café de spécialité..."
-                    disabled={slide.show_subtitle === false}
-                    className={`w-full text-xs p-2.5 bg-[#FAF7F2] border border-[#3D2216]/10 rounded-xl focus:border-[#C4A484] outline-none resize-none ${
-                      slide.show_subtitle === false ? "opacity-40 bg-gray-100 cursor-not-allowed" : ""
-                    }`}
-                  />
-                  {slide.show_subtitle === false && (
-                    <span className="text-[9px] text-[#C83E4D] font-bold uppercase tracking-wider mt-1 block">
-                      ⚠️ Le sous-titre sera masqué sur le site pour cette slide.
-                    </span>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3D2216] mb-1">
-                    Texte du Bouton CTA
-                  </label>
-                  <input
-                    type="text"
-                    value={slide.button_text || ""}
-                    onChange={(e) => handleMetadataChange(idx, "button_text", e.target.value)}
-                    placeholder="Commander l'Original..."
-                    className="w-full text-xs p-2.5 bg-[#FAF7F2] border border-[#3D2216]/10 rounded-xl focus:border-[#C4A484] outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3D2216]/70 mb-1">
-                    Texte alternatif (ALT SEO)
-                  </label>
-                  <input
-                    type="text"
-                    value={slide.alt_text || ""}
-                    onChange={(e) => handleMetadataChange(idx, "alt_text", e.target.value)}
-                    placeholder="Description pour l'accessibilité..."
-                    className="w-full text-xs p-2.5 bg-[#FAF7F2] border border-[#3D2216]/10 rounded-xl focus:border-[#C4A484] outline-none text-[#3D2216]/80"
-                  />
-                </div>
-              </div>
+                );
+              })()}
             </div>
           </div>
         ))}
@@ -851,12 +866,12 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
           )}
 
           <div className="relative z-10 max-w-xl">
-            {currentPreviewSlide?.show_title !== false && (
+            {(currentPreviewSlide?.crop_data?.show_title ?? currentPreviewSlide?.show_title) !== false && (
               <h3 className="text-2xl sm:text-4xl font-extrabold text-[#150B07] uppercase tracking-tight">
                 {currentPreviewSlide?.title_text || "Le Tiramisu Réinventé"}
               </h3>
             )}
-            {currentPreviewSlide?.show_subtitle !== false && (
+            {(currentPreviewSlide?.crop_data?.show_subtitle ?? currentPreviewSlide?.show_subtitle) !== false && (
               <p className="text-xs sm:text-sm text-[#3D2216]/80 mt-3 font-light leading-relaxed">
                 {currentPreviewSlide?.subtitle_text || "Le premier tiramisu gastronomique au café de spécialité fait son entrée officielle au menu."}
               </p>
