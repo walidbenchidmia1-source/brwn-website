@@ -12,23 +12,11 @@ async function getHeroData() {
   try {
     const supabaseAdmin = createAdminClient();
 
-    let slides: any[] | null = null;
-    const { data: fetchSlides, error: slidesErr } = await supabaseAdmin
+    const { data: slides } = await supabaseAdmin
       .from("hero_slides")
-      .select("id, media_type, image_url, mobile_image_url, alt_text, title_text, subtitle_text, button_text, aria_label, position, crop_data, show_title, show_subtitle")
+      .select("id, media_type, image_url, mobile_image_url, alt_text, title_text, subtitle_text, button_text, aria_label, position, crop_data")
       .eq("is_active", true)
       .order("position", { ascending: true });
-
-    slides = fetchSlides;
-
-    if (slidesErr && slidesErr.message.includes("Could not find")) {
-      const { data: fallbackSlides } = await supabaseAdmin
-        .from("hero_slides")
-        .select("id, media_type, image_url, mobile_image_url, alt_text, title_text, subtitle_text, button_text, aria_label, position, crop_data")
-        .eq("is_active", true)
-        .order("position", { ascending: true });
-      slides = fallbackSlides;
-    }
 
     const { data: settings } = await supabaseAdmin
       .from("hero_settings")
@@ -36,7 +24,7 @@ async function getHeroData() {
       .eq("id", "global")
       .maybeSingle();
 
-    const normalizedSlides = (slides || []).map((s) => ({
+    const normalizedSlides = (slides || []).map((s: any) => ({
       ...s,
       show_title: s.crop_data?.show_title ?? s.show_title ?? true,
       show_subtitle: s.crop_data?.show_subtitle ?? s.show_subtitle ?? true,

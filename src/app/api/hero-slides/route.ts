@@ -36,25 +36,12 @@ export async function GET() {
   try {
     const supabase = await createClient();
 
-    // Récupération des slides actives avec toutes les colonnes via le client standard RLS
-    let slides: any[] | null = null;
-    const { data: fetchSlides, error: slidesError } = await supabase
+    // Récupération des slides actives avec les colonnes garanties via le client standard RLS
+    const { data: slides, error: slidesError } = await supabase
       .from("hero_slides")
-      .select("id, media_type, image_url, mobile_image_url, alt_text, title_text, subtitle_text, button_text, aria_label, position, crop_data, show_title, show_subtitle")
+      .select("id, media_type, image_url, mobile_image_url, alt_text, title_text, subtitle_text, button_text, aria_label, position, crop_data")
       .eq("is_active", true)
       .order("position", { ascending: true });
-
-    slides = fetchSlides;
-
-    if (slidesError && slidesError.message.includes("Could not find")) {
-      // Fallback gracieux si la migration n'a pas encore été exécutée dans le SQL Editor de Supabase
-      const { data: fallbackSlides } = await supabase
-        .from("hero_slides")
-        .select("id, media_type, image_url, mobile_image_url, alt_text, title_text, subtitle_text, button_text, aria_label, position, crop_data")
-        .eq("is_active", true)
-        .order("position", { ascending: true });
-      slides = fallbackSlides;
-    }
 
     // Récupération des paramètres globaux
     const { data: settingsData } = await supabase
@@ -65,7 +52,7 @@ export async function GET() {
 
     const heroSettings = settingsData || DEFAULT_SETTINGS;
 
-    const normalizedSlides = (slides || []).map((s) => ({
+    const normalizedSlides = (slides || []).map((s: any) => ({
       ...s,
       show_title: s.crop_data?.show_title ?? s.show_title ?? true,
       show_subtitle: s.crop_data?.show_subtitle ?? s.show_subtitle ?? true,
