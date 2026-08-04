@@ -872,7 +872,7 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
             const isPrevSubVisible = (currentPreviewSlide?.crop_data?.show_subtitle ?? currentPreviewSlide?.show_subtitle) !== false;
             return (
               <div className={`relative z-10 max-w-xl flex flex-col items-center ${
-                !isPrevTitleVisible && !isPrevSubVisible ? "mt-12 sm:mt-16" : ""
+                !isPrevTitleVisible && !isPrevSubVisible ? "mt-24 sm:mt-28" : ""
               }`}>
                 {isPrevTitleVisible && (
                   <h3 className="text-2xl sm:text-4xl font-extrabold text-[#150B07] uppercase tracking-tight">
@@ -885,7 +885,7 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
                   </p>
                 )}
                 <button className={`${
-                  !isPrevTitleVisible && !isPrevSubVisible ? "mt-8 sm:mt-12" : "mt-5"
+                  !isPrevTitleVisible && !isPrevSubVisible ? "mt-16 sm:mt-20" : "mt-6"
                 } px-6 py-2.5 bg-[#150B07] text-[#FAF7F2] text-xs font-bold uppercase rounded-full tracking-widest shadow-md`}>
                   {currentPreviewSlide?.button_text || "Commander l'Original"}
                 </button>

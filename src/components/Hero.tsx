@@ -269,7 +269,7 @@ export default function Hero({ initialSlides, initialSettings }: HeroProps) {
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="relative w-full min-h-[calc(100svh-80px)] md:min-h-0 md:h-[75vh] flex flex-col justify-center items-center pt-20 sm:pt-24 md:pt-28 pb-12 overflow-hidden px-6 select-none border-b border-[#3D2216]/5"
+      className="relative w-full min-h-[calc(100svh-80px)] md:min-h-0 md:h-[80vh] flex flex-col justify-end md:justify-center items-center pt-28 sm:pt-36 md:pt-36 pb-16 sm:pb-20 md:pb-16 overflow-hidden px-6 select-none border-b border-[#3D2216]/5"
     >
       {/* 1. CARROUSEL D'IMAGES DE FOND DYNAMIQUE */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
@@ -366,7 +366,7 @@ export default function Hero({ initialSlides, initialSettings }: HeroProps) {
           <div
             ref={contentRef}
             className={`relative max-w-4xl w-full flex flex-col items-center text-center z-20 px-4 gap-4 md:gap-0 ${
-              !isTitleVisible && !isSubtitleVisible ? "mt-12 sm:mt-20 md:mt-24" : "mt-2 sm:mt-4 md:mt-6"
+              !isTitleVisible && !isSubtitleVisible ? "mt-24 sm:mt-32 md:mt-36 mb-6 sm:mb-10 md:mb-4" : "mt-4 sm:mt-6 md:mt-8"
             }`}
           >
             {isTitleVisible && (
@@ -394,8 +394,8 @@ export default function Hero({ initialSlides, initialSettings }: HeroProps) {
               }}
               className={`${
                 !isTitleVisible && !isSubtitleVisible
-                  ? "mt-8 sm:mt-16 md:mt-20"
-                  : "mt-4 md:mt-8"
+                  ? "mt-16 sm:mt-24 md:mt-28 mb-4"
+                  : "mt-6 md:mt-8"
               } px-10 py-4 bg-[#150B07] hover:bg-[#3D2216] text-[#F9F6F0] font-sans text-xs md:text-sm font-semibold tracking-widest uppercase rounded-full shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2`}
             >
               {currentSlide?.button_text || "Commander l'Original"}
