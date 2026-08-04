@@ -200,6 +200,8 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
           button_text: currentSlide.button_text,
           aria_label: currentSlide.aria_label,
           is_active: currentSlide.is_active,
+          show_title: currentSlide.show_title,
+          show_subtitle: currentSlide.show_subtitle,
           crop_data: currentSlide.crop_data,
         }),
       });
@@ -354,6 +356,8 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
             button_text: slide.button_text,
             aria_label: slide.aria_label,
             is_active: slide.is_active,
+            show_title: slide.show_title,
+            show_subtitle: slide.show_subtitle,
             crop_data: slide.crop_data,
           }),
         });
