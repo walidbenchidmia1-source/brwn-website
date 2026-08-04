@@ -867,21 +867,31 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
             />
           )}
 
-          <div className="relative z-10 max-w-xl">
-            {(currentPreviewSlide?.crop_data?.show_title ?? currentPreviewSlide?.show_title) !== false && (
-              <h3 className="text-2xl sm:text-4xl font-extrabold text-[#150B07] uppercase tracking-tight">
-                {currentPreviewSlide?.title_text || "Le Tiramisu Réinventé"}
-              </h3>
-            )}
-            {(currentPreviewSlide?.crop_data?.show_subtitle ?? currentPreviewSlide?.show_subtitle) !== false && (
-              <p className="text-xs sm:text-sm text-[#3D2216]/80 mt-3 font-light leading-relaxed">
-                {currentPreviewSlide?.subtitle_text || "Le premier tiramisu gastronomique au café de spécialité fait son entrée officielle au menu."}
-              </p>
-            )}
-            <button className="mt-5 px-6 py-2.5 bg-[#150B07] text-[#FAF7F2] text-xs font-bold uppercase rounded-full tracking-widest shadow-md">
-              {currentPreviewSlide?.button_text || "Commander l'Original"}
-            </button>
-          </div>
+          {(() => {
+            const isPrevTitleVisible = (currentPreviewSlide?.crop_data?.show_title ?? currentPreviewSlide?.show_title) !== false;
+            const isPrevSubVisible = (currentPreviewSlide?.crop_data?.show_subtitle ?? currentPreviewSlide?.show_subtitle) !== false;
+            return (
+              <div className={`relative z-10 max-w-xl flex flex-col items-center ${
+                !isPrevTitleVisible && !isPrevSubVisible ? "mt-12 sm:mt-16" : ""
+              }`}>
+                {isPrevTitleVisible && (
+                  <h3 className="text-2xl sm:text-4xl font-extrabold text-[#150B07] uppercase tracking-tight">
+                    {currentPreviewSlide?.title_text || "Le Tiramisu Réinventé"}
+                  </h3>
+                )}
+                {isPrevSubVisible && (
+                  <p className="text-xs sm:text-sm text-[#3D2216]/80 mt-3 font-light leading-relaxed">
+                    {currentPreviewSlide?.subtitle_text || "Le premier tiramisu gastronomique au café de spécialité fait son entrée officielle au menu."}
+                  </p>
+                )}
+                <button className={`${
+                  !isPrevTitleVisible && !isPrevSubVisible ? "mt-8 sm:mt-12" : "mt-5"
+                } px-6 py-2.5 bg-[#150B07] text-[#FAF7F2] text-xs font-bold uppercase rounded-full tracking-widest shadow-md`}>
+                  {currentPreviewSlide?.button_text || "Commander l'Original"}
+                </button>
+              </div>
+            );
+          })()}
 
           {activeSlides.length > 1 && (
             <>
