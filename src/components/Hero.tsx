@@ -269,7 +269,7 @@ export default function Hero({ initialSlides, initialSettings }: HeroProps) {
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="relative w-full min-h-[calc(100svh-80px)] md:min-h-0 md:h-[82vh] flex flex-col justify-end items-center pt-24 sm:pt-32 md:pt-36 pb-16 sm:pb-20 md:pb-16 overflow-hidden px-6 select-none border-b border-[#3D2216]/5"
+      className="relative w-full min-h-[calc(100svh-80px)] md:min-h-0 md:h-[85vh] flex flex-col justify-end items-center pt-24 sm:pt-32 md:pt-36 pb-3 sm:pb-4 md:pb-4 overflow-hidden px-6 select-none border-b border-[#3D2216]/5"
     >
       {/* 1. CARROUSEL D'IMAGES DE FOND DYNAMIQUE */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
@@ -367,8 +367,8 @@ export default function Hero({ initialSlides, initialSettings }: HeroProps) {
             ref={contentRef}
             className={`relative max-w-4xl w-full flex flex-col items-center text-center z-20 px-4 gap-4 md:gap-0 ${
               !isTitleVisible && !isSubtitleVisible
-                ? "mt-auto mb-8 sm:mb-12 md:mb-6"
-                : "mt-auto mb-4 sm:mb-6 md:mb-4"
+                ? "mt-auto mb-2 sm:mb-3 md:mb-3"
+                : "mt-auto mb-2 sm:mb-4 md:mb-4"
             }`}
           >
             {isTitleVisible && (
@@ -396,7 +396,7 @@ export default function Hero({ initialSlides, initialSettings }: HeroProps) {
               }}
               className={`${
                 !isTitleVisible && !isSubtitleVisible
-                  ? "mt-24 sm:mt-32 md:mt-32 mb-2"
+                  ? "mt-auto mb-5 sm:mb-6 md:mb-6"
                   : "mt-6 md:mt-8"
               } px-10 py-4 bg-[#150B07] hover:bg-[#3D2216] text-[#F9F6F0] font-sans text-xs md:text-sm font-semibold tracking-widest uppercase rounded-full shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2`}
             >
@@ -429,7 +429,7 @@ export default function Hero({ initialSlides, initialSettings }: HeroProps) {
 
       {/* Indicateurs de points */}
       {slides.length > 1 && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-30">
+        <div className="absolute bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 z-30">
           {slides.map((_, i) => (
             <button
               key={i}
