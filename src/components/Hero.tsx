@@ -95,7 +95,7 @@ export default function Hero({ initialSlides, initialSettings }: HeroProps) {
   useEffect(() => {
     async function fetchSlidesAndSettings() {
       try {
-        const res = await fetch("/api/hero-slides", { cache: "no-store" });
+        const res = await fetch(`/api/hero-slides?t=${Date.now()}`, { cache: "no-store", headers: { "Pragma": "no-cache", "Cache-Control": "no-cache" } });
         if (res.ok) {
           const data = await res.json();
           if (data.slides && data.slides.length > 0) {

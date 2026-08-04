@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/utils/supabase/server";
 import { createAdminClient } from "@/utils/supabase/admin";
 
@@ -333,6 +334,11 @@ export async function POST(req: NextRequest) {
         show_subtitle: finalCropData.show_subtitle,
       };
 
+      try {
+        revalidatePath("/", "page");
+        revalidatePath("/api/hero-slides");
+      } catch {}
+
       return NextResponse.json({ success: true, slide: normalizedUploadSlide, message: "Image enregistrée avec succès" });
     }
 
@@ -409,6 +415,11 @@ export async function POST(req: NextRequest) {
         show_subtitle: finalCropData.show_subtitle,
       };
 
+      try {
+        revalidatePath("/", "page");
+        revalidatePath("/api/hero-slides");
+      } catch {}
+
       return NextResponse.json({ success: true, slide: normalizedSaveSlide, message: "Slide sauvegardée avec succès" });
     }
 
@@ -454,6 +465,11 @@ export async function DELETE(req: NextRequest) {
 
       await supabaseAdmin.from("hero_slides").delete().eq("id", slideId);
     }
+
+    try {
+      revalidatePath("/", "page");
+      revalidatePath("/api/hero-slides");
+    } catch {}
 
     return NextResponse.json({ success: true, message: "Slide supprimée avec succès" });
   } catch (err: any) {
