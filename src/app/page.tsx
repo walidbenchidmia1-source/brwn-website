@@ -12,11 +12,23 @@ async function getHeroData() {
   try {
     const supabaseAdmin = createAdminClient();
 
-    const { data: slides } = await supabaseAdmin
+    let slides: any[] | null = null;
+    const { data: fetchSlides, error: slidesErr } = await supabaseAdmin
       .from("hero_slides")
       .select("id, media_type, image_url, mobile_image_url, alt_text, title_text, subtitle_text, button_text, aria_label, position, crop_data, show_title, show_subtitle")
       .eq("is_active", true)
       .order("position", { ascending: true });
+
+    slides = fetchSlides;
+
+    if (slidesErr && slidesErr.message.includes("Could not find")) {
+      const { data: fallbackSlides } = await supabaseAdmin
+        .from("hero_slides")
+        .select("id, media_type, image_url, mobile_image_url, alt_text, title_text, subtitle_text, button_text, aria_label, position, crop_data")
+        .eq("is_active", true)
+        .order("position", { ascending: true });
+      slides = fallbackSlides;
+    }
 
     const { data: settings } = await supabaseAdmin
       .from("hero_settings")

@@ -299,6 +299,18 @@ export async function POST(req: NextRequest) {
         .single();
 
       if (upsertError) {
+        if (upsertError.message.includes("Could not find") || upsertError.message.includes("column")) {
+          delete slidePayload.show_title;
+          delete slidePayload.show_subtitle;
+          const { data: retrySlide, error: retryErr } = await supabaseAdmin
+            .from("hero_slides")
+            .upsert(slidePayload, { onConflict: "position" })
+            .select()
+            .single();
+          if (!retryErr) {
+            return NextResponse.json({ success: true, slide: retrySlide, message: "Image enregistrée avec succès" });
+          }
+        }
         return NextResponse.json({ error: upsertError.message }, { status: 500 });
       }
 
@@ -344,6 +356,18 @@ export async function POST(req: NextRequest) {
         .single();
 
       if (saveError) {
+        if (saveError.message.includes("Could not find") || saveError.message.includes("column")) {
+          delete upsertPayload.show_title;
+          delete upsertPayload.show_subtitle;
+          const { data: retrySavedSlide, error: retrySaveErr } = await supabaseAdmin
+            .from("hero_slides")
+            .upsert(upsertPayload, { onConflict: "position" })
+            .select()
+            .single();
+          if (!retrySaveErr) {
+            return NextResponse.json({ success: true, slide: retrySavedSlide, message: "Slide sauvegardée avec succès" });
+          }
+        }
         return NextResponse.json({ error: saveError.message }, { status: 500 });
       }
 
