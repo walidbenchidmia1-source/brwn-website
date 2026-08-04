@@ -17,6 +17,7 @@ const DEFAULT_SLIDE = {
   position: 1,
   crop_data: { zoom: 1, x: 0, y: 0 },
   show_title: true,
+  show_subtitle: true,
 };
 
 const DEFAULT_SETTINGS = {
@@ -38,7 +39,7 @@ export async function GET() {
     // Récupération des slides actives avec toutes les colonnes via le client standard RLS
     const { data: slides, error: slidesError } = await supabase
       .from("hero_slides")
-      .select("id, media_type, image_url, mobile_image_url, alt_text, title_text, subtitle_text, button_text, aria_label, position, crop_data, show_title")
+      .select("id, media_type, image_url, mobile_image_url, alt_text, title_text, subtitle_text, button_text, aria_label, position, crop_data, show_title, show_subtitle")
       .eq("is_active", true)
       .order("position", { ascending: true });
 

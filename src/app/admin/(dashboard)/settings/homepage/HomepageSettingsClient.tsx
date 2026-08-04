@@ -51,6 +51,7 @@ interface HeroSlide {
   file_format?: string | null;
   crop_data?: { zoom: number; x: number; y: number } | null;
   show_title?: boolean;
+  show_subtitle?: boolean;
 }
 
 interface HeroSettings {
@@ -747,17 +748,38 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3D2216] mb-1 flex items-center gap-1">
-                    <AlignLeft className="w-3 h-3 text-[#D97706]" />
-                    Sous-titre / Description
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-[#3D2216] flex items-center gap-1">
+                      <AlignLeft className="w-3 h-3 text-[#D97706]" />
+                      Sous-titre / Description
+                    </label>
+                    <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={slide.show_subtitle !== false}
+                        onChange={(e) => handleMetadataChange(idx, "show_subtitle", e.target.checked)}
+                        className="w-3.5 h-3.5 accent-[#3D2216] cursor-pointer rounded"
+                      />
+                      <span className={`text-[10px] font-bold uppercase tracking-wider ${slide.show_subtitle !== false ? "text-[#3D2216]" : "text-[#C83E4D]"}`}>
+                        {slide.show_subtitle !== false ? "Affiché" : "Masqué"}
+                      </span>
+                    </label>
+                  </div>
                   <textarea
                     rows={2}
                     value={slide.subtitle_text || ""}
                     onChange={(e) => handleMetadataChange(idx, "subtitle_text", e.target.value)}
                     placeholder="Le premier tiramisu gastronomique au café de spécialité..."
-                    className="w-full text-xs p-2.5 bg-[#FAF7F2] border border-[#3D2216]/10 rounded-xl focus:border-[#C4A484] outline-none resize-none"
+                    disabled={slide.show_subtitle === false}
+                    className={`w-full text-xs p-2.5 bg-[#FAF7F2] border border-[#3D2216]/10 rounded-xl focus:border-[#C4A484] outline-none resize-none ${
+                      slide.show_subtitle === false ? "opacity-40 bg-gray-100 cursor-not-allowed" : ""
+                    }`}
                   />
+                  {slide.show_subtitle === false && (
+                    <span className="text-[9px] text-[#C83E4D] font-bold uppercase tracking-wider mt-1 block">
+                      ⚠️ Le sous-titre sera masqué sur le site pour cette slide.
+                    </span>
+                  )}
                 </div>
 
                 <div>
@@ -830,9 +852,11 @@ export default function HomepageSettingsClient({ initialSlides, initialSettings 
                 {currentPreviewSlide?.title_text || "Le Tiramisu Réinventé"}
               </h3>
             )}
-            <p className="text-xs sm:text-sm text-[#3D2216]/80 mt-3 font-light leading-relaxed">
-              {currentPreviewSlide?.subtitle_text || "Le premier tiramisu gastronomique au café de spécialité fait son entrée officielle au menu."}
-            </p>
+            {currentPreviewSlide?.show_subtitle !== false && (
+              <p className="text-xs sm:text-sm text-[#3D2216]/80 mt-3 font-light leading-relaxed">
+                {currentPreviewSlide?.subtitle_text || "Le premier tiramisu gastronomique au café de spécialité fait son entrée officielle au menu."}
+              </p>
+            )}
             <button className="mt-5 px-6 py-2.5 bg-[#150B07] text-[#FAF7F2] text-xs font-bold uppercase rounded-full tracking-widest shadow-md">
               {currentPreviewSlide?.button_text || "Commander l'Original"}
             </button>

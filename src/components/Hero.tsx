@@ -19,6 +19,7 @@ interface HeroSlide {
   position: number;
   crop_data?: { zoom: number; x: number; y: number } | null;
   show_title?: boolean;
+  show_subtitle?: boolean;
 }
 
 interface HeroSettings {
@@ -372,12 +373,14 @@ export default function Hero({ initialSlides, initialSettings }: HeroProps) {
               </h1>
             )}
 
-            <p
-              ref={subtitleRef}
-              className="font-sans text-[#3D2216]/80 text-sm sm:text-lg md:text-xl font-light tracking-wide max-w-xl sm:max-w-2xl mt-0 md:mt-6 leading-relaxed transition-all duration-500"
-            >
-              {currentSlide?.subtitle_text || "Le premier tiramisu gastronomique au café de spécialité fait son entrée officielle au menu."}
-            </p>
+            {currentSlide?.show_subtitle !== false && (
+              <p
+                ref={subtitleRef}
+                className="font-sans text-[#3D2216]/80 text-sm sm:text-lg md:text-xl font-light tracking-wide max-w-xl sm:max-w-2xl mt-0 md:mt-6 leading-relaxed transition-all duration-500"
+              >
+                {currentSlide?.subtitle_text || "Le premier tiramisu gastronomique au café de spécialité fait son entrée officielle au menu."}
+              </p>
+            )}
 
             <button
               ref={buttonRef}
