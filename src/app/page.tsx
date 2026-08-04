@@ -14,7 +14,7 @@ async function getHeroData() {
 
     const { data: slides } = await supabaseAdmin
       .from("hero_slides")
-      .select("id, media_type, image_url, mobile_image_url, alt_text, title_text, subtitle_text, button_text, aria_label, position, crop_data")
+      .select("id, media_type, image_url, mobile_image_url, alt_text, title_text, subtitle_text, button_text, aria_label, position, crop_data, show_title")
       .eq("is_active", true)
       .order("position", { ascending: true });
 

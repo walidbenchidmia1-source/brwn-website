@@ -18,6 +18,7 @@ interface HeroSlide {
   aria_label?: string | null;
   position: number;
   crop_data?: { zoom: number; x: number; y: number } | null;
+  show_title?: boolean;
 }
 
 interface HeroSettings {
@@ -362,12 +363,14 @@ export default function Hero({ initialSlides, initialSettings }: HeroProps) {
             ref={contentRef}
             className="relative max-w-4xl w-full flex flex-col items-center text-center z-20 px-4 gap-4 md:gap-0"
           >
-            <h1
-              ref={titleRef}
-              className="font-sans font-extrabold text-[#150B07] text-3xl sm:text-5xl md:text-[4.5vw] tracking-tighter leading-[1.15] uppercase transition-all duration-500"
-            >
-              {currentSlide?.title_text || "Le Tiramisu Réinventé"}
-            </h1>
+            {currentSlide?.show_title !== false && (
+              <h1
+                ref={titleRef}
+                className="font-sans font-extrabold text-[#150B07] text-3xl sm:text-5xl md:text-[4.5vw] tracking-tighter leading-[1.15] uppercase transition-all duration-500"
+              >
+                {currentSlide?.title_text || "Le Tiramisu Réinventé"}
+              </h1>
+            )}
 
             <p
               ref={subtitleRef}
