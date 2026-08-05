@@ -16,6 +16,7 @@ import {
   Sparkles,
   CheckCircle2
 } from "lucide-react";
+import HalalIcon from "@/components/HalalIcon";
 
 interface Review {
   text: string;
@@ -346,13 +347,8 @@ export default function ProductDetailPage({ params }: PageProps) {
                 <Sparkles className="w-3 h-3 text-inherit" />
                 {product.badge_text || "GOURMAND"}
               </span>
-              <div className="inline-flex items-center ml-1.5">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/images/halal_seal_white.png"
-                  alt="Certification Halal"
-                  className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
-                />
+              <div className="inline-flex items-center ml-1.5 text-[#FAF7F2]">
+                <HalalIcon className="w-10 h-10 sm:w-12 sm:h-12" />
               </div>
               {isOutOfStock && (
                 <span className="px-3.5 py-1.5 bg-[#C83E4D] text-[#F9F6F0] text-[10px] font-bold uppercase rounded-full border border-[#C83E4D]/25">
