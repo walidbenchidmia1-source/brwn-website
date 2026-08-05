@@ -355,9 +355,21 @@ export default function ProductDetailPage({ params }: PageProps) {
             <h1 className="font-sans text-4xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tighter leading-none mb-6">
               {product.name}
             </h1>
-            <p className="font-sans text-sm sm:text-base text-[#FAF7F2]/90 leading-relaxed font-light mb-8 max-w-lg">
-              {product.description}
-            </p>
+            <div className="flex items-center gap-4 mb-8 max-w-lg">
+              <p className="font-sans text-sm sm:text-base text-[#FAF7F2]/90 leading-relaxed font-light flex-grow">
+                {product.description}
+              </p>
+              <div className="flex-shrink-0">
+                <Image
+                  src="/images/halal_badge.png"
+                  alt="Certification Halal"
+                  width={48}
+                  height={48}
+                  className="w-12 h-12 object-contain"
+                  unoptimized
+                />
+              </div>
+            </div>
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center mb-8">

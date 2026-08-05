@@ -279,9 +279,21 @@ export default function Deconstruction() {
                     {product.name}
                   </h3>
 
-                  <p className="font-sans text-sm md:text-base text-[#3D2216]/75 group-hover:text-[#F9F6F0]/85 transition-colors duration-500 leading-relaxed font-light mb-5 md:mb-8 max-w-lg">
-                    {product.description}
-                  </p>
+                  <div className="flex items-center gap-4 mb-5 md:mb-8 max-w-lg">
+                    <p className="font-sans text-sm md:text-base text-[#3D2216]/75 group-hover:text-[#F9F6F0]/85 transition-colors duration-500 leading-relaxed font-light flex-grow">
+                      {product.description}
+                    </p>
+                    <div className="flex-shrink-0">
+                      <Image
+                        src="/images/halal_badge.png"
+                        alt="Certification Halal"
+                        width={48}
+                        height={48}
+                        className="w-12 h-12 object-contain"
+                        unoptimized
+                      />
+                    </div>
+                  </div>
 
                   <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
                     <Link
