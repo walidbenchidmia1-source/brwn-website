@@ -269,8 +269,15 @@ export default function Deconstruction() {
                       <Sparkles className="w-3 h-3" style={{ color: 'inherit' }} />
                       {product.badge_text || styles.badge}
                     </span>
-                    <div className="inline-flex items-center ml-1.5 text-[#3D2216] group-hover:text-[#F9F6F0] transition-colors duration-500">
-                      <HalalIcon className="w-10 h-10 sm:w-12 sm:h-12" />
+                    <div className="inline-flex items-center ml-1.5 transition-all duration-500">
+                      <Image
+                        src={hoveredId === product.id ? "/images/halal_hd_white.png" : "/images/halal_hd.png"}
+                        alt="Certification Halal"
+                        width={48}
+                        height={48}
+                        className="w-10 h-10 sm:w-12 sm:h-12 object-contain transition-opacity duration-500"
+                        unoptimized
+                      />
                     </div>
                     {isOutOfStock && (
                       <span className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full font-sans text-[10px] font-bold uppercase tracking-wider bg-[#C83E4D] text-[#F9F6F0] border border-[#C83E4D]/25">
