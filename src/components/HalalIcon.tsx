@@ -10,16 +10,19 @@ export default function HalalIcon({ className = "w-10 h-10 sm:w-12 sm:h-12", sty
       fill="currentColor"
       className={className}
       style={style}
-      aria-label="Halal"
+      aria-label="Certification Halal"
     >
-      <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" strokeWidth="5" />
-      <path d="M 68 49 C 64 45 59 43 56 46 C 54 48 55 52 60 52 C 67 52 73 50 78 47 C 76 46 73 45 70 45 C 62 45 55 50 48 57 C 45 60 40 60 36 57 C 32 54 30 46 30 35 L 30 30 C 30 28 26 28 26 30 L 26 52 C 26 60 31 66 38 66 C 44 66 50 63 55 58 C 60 63 67 66 74 66 L 76 66 L 76 61 C 72 61 69 57 68 49 Z M 48 44 L 48 30 C 48 28 44 28 44 30 L 44 47 C 46 45 47 44 48 44 Z" />
+      <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" strokeWidth="6" />
+      <path
+        d="M 77 44 C 73 40 67 37 60 41 C 55 44 57 49 62 49 C 70 49 76 46 81 43 C 79 42 76 41 73 41 C 64 41 57 46 49 54 C 46 57 40 57 36 54 C 31 51 29 42 29 30 L 29 24 L 23 24 L 23 52 C 23 61 29 67 38 67 C 45 67 51 63 56 57 C 62 63 69 67 77 67 L 79 67 L 79 61 C 75 61 71 56 70 47 Z M 48 42 L 48 24 L 42 24 L 42 46 Z"
+        fill="currentColor"
+      />
       <text
         x="50"
         y="78"
-        fontSize="15"
+        fontSize="16"
         fontWeight="900"
-        fontFamily="sans-serif"
+        fontFamily="Arial, system-ui, sans-serif"
         textAnchor="middle"
         letterSpacing="1"
         fill="currentColor"
