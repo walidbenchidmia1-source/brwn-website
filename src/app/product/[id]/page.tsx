@@ -348,7 +348,7 @@ export default function ProductDetailPage({ params }: PageProps) {
               </span>
               <div className="inline-flex items-center ml-1">
                 <Image
-                  src="/images/halal_icon_white.png"
+                  src="/images/halal_seal_white.png"
                   alt="Certification Halal"
                   width={32}
                   height={32}

@@ -270,7 +270,7 @@ export default function Deconstruction() {
                     </span>
                     <div className="inline-flex items-center ml-1 transition-all duration-500">
                       <Image
-                        src={hoveredId === product.id ? "/images/halal_icon_white.png" : "/images/halal_icon.png"}
+                        src={hoveredId === product.id ? "/images/halal_seal_white.png" : "/images/halal_seal.png"}
                         alt="Certification Halal"
                         width={32}
                         height={32}
