@@ -12,7 +12,9 @@ import {
   Check, 
   ShoppingBag,
   X,
-  Loader
+  Loader,
+  Sparkles,
+  CheckCircle2
 } from "lucide-react";
 
 interface Review {
@@ -339,12 +341,17 @@ export default function ProductDetailPage({ params }: PageProps) {
 
           {/* Product Details on the Right */}
           <div className="w-full md:w-1/2 flex flex-col text-left md:pl-12 text-[#F9F6F0]">
-            <div className="flex flex-wrap gap-2 items-center mb-2">
-              <span className="font-sans text-xs md:text-sm font-semibold tracking-[0.25em] text-[#FAF7F2]/80 uppercase">
-                {product.tagline}
+            <div className="flex flex-wrap gap-2 items-center mb-3">
+              <span className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full font-sans text-[10px] font-bold uppercase tracking-wider bg-[#FAF7F2]/15 text-[#FAF7F2] backdrop-blur-xs">
+                <Sparkles className="w-3 h-3 text-inherit" />
+                {product.badge_text || "GOURMAND"}
+              </span>
+              <span className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full font-sans text-[10px] font-bold uppercase tracking-wider bg-[#FAF7F2]/15 text-[#FAF7F2] backdrop-blur-xs">
+                <CheckCircle2 className="w-3 h-3 text-inherit" />
+                HALAL
               </span>
               {isOutOfStock && (
-                <span className="px-2.5 py-0.5 bg-[#C83E4D] text-[#F9F6F0] text-[9px] font-bold uppercase rounded-full border border-[#C83E4D]/25">
+                <span className="px-3.5 py-1.5 bg-[#C83E4D] text-[#F9F6F0] text-[10px] font-bold uppercase rounded-full border border-[#C83E4D]/25">
                   Rupture de Stock
                 </span>
               )}

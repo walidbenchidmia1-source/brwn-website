@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, X, Check, Coffee, Shell, Leaf, Flame, Star, Sparkles, Heart, Loader, ShoppingBag } from "lucide-react";
+import { ArrowRight, X, Check, Coffee, Shell, Leaf, Flame, Star, Sparkles, Heart, Loader, ShoppingBag, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useCart } from "@/context/CartContext";
 
@@ -253,7 +253,7 @@ export default function Deconstruction() {
                   </div>
                 </div>
                 <div className="w-full md:w-1/2 flex flex-col text-left md:pl-8">
-                  <div className="mb-2 md:mb-4 flex flex-wrap gap-2">
+                  <div className="mb-2 md:mb-4 flex flex-wrap gap-2 items-center">
                     <span 
                       className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full font-sans text-[10px] font-bold uppercase tracking-wider transition-colors duration-500"
                       style={{
@@ -267,6 +267,20 @@ export default function Deconstruction() {
                     >
                       <Sparkles className="w-3 h-3" style={{ color: 'inherit' }} />
                       {product.badge_text || styles.badge}
+                    </span>
+                    <span 
+                      className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full font-sans text-[10px] font-bold uppercase tracking-wider transition-colors duration-500"
+                      style={{
+                        backgroundColor: hoveredId === product.id
+                          ? (product.badge_text_color || '#F9F6F0')
+                          : (product.badge_bg_color || '#3D2216'),
+                        color: hoveredId === product.id
+                          ? (product.badge_bg_color || '#3D2216')
+                          : (product.badge_text_color || '#F9F6F0')
+                      }}
+                    >
+                      <CheckCircle2 className="w-3 h-3" style={{ color: 'inherit' }} />
+                      HALAL
                     </span>
                     {isOutOfStock && (
                       <span className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full font-sans text-[10px] font-bold uppercase tracking-wider bg-[#C83E4D] text-[#F9F6F0] border border-[#C83E4D]/25">
