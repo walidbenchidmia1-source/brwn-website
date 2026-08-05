@@ -347,8 +347,8 @@ export default function ProductDetailPage({ params }: PageProps) {
                 <Sparkles className="w-3 h-3 text-inherit" />
                 {product.badge_text || "GOURMAND"}
               </span>
-              <div className="inline-flex items-center ml-1 text-[#FAF7F2]">
-                <HalalIcon className="w-7 h-7 sm:w-8 sm:h-8" />
+              <div className="inline-flex items-center ml-1.5 text-[#FAF7F2]">
+                <HalalIcon className="w-10 h-10 sm:w-12 sm:h-12" />
               </div>
               {isOutOfStock && (
                 <span className="px-3.5 py-1.5 bg-[#C83E4D] text-[#F9F6F0] text-[10px] font-bold uppercase rounded-full border border-[#C83E4D]/25">

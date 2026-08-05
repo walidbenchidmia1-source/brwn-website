@@ -269,8 +269,8 @@ export default function Deconstruction() {
                       <Sparkles className="w-3 h-3" style={{ color: 'inherit' }} />
                       {product.badge_text || styles.badge}
                     </span>
-                    <div className="inline-flex items-center ml-1 text-[#3D2216] group-hover:text-[#F9F6F0] transition-colors duration-500">
-                      <HalalIcon className="w-7 h-7 sm:w-8 sm:h-8" />
+                    <div className="inline-flex items-center ml-1.5 text-[#3D2216] group-hover:text-[#F9F6F0] transition-colors duration-500">
+                      <HalalIcon className="w-10 h-10 sm:w-12 sm:h-12" />
                     </div>
                     {isOutOfStock && (
                       <span className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full font-sans text-[10px] font-bold uppercase tracking-wider bg-[#C83E4D] text-[#F9F6F0] border border-[#C83E4D]/25">

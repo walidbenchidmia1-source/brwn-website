@@ -2,7 +2,7 @@
 
 import React from "react";
 
-export default function HalalIcon({ className = "w-7 h-7", style }: { className?: string; style?: React.CSSProperties }) {
+export default function HalalIcon({ className = "w-10 h-10 sm:w-12 sm:h-12", style }: { className?: string; style?: React.CSSProperties }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
