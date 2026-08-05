@@ -268,26 +268,15 @@ export default function Deconstruction() {
                       <Sparkles className="w-3 h-3" style={{ color: 'inherit' }} />
                       {product.badge_text || styles.badge}
                     </span>
-                    <span 
-                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-sans text-[10px] font-bold uppercase tracking-wider transition-colors duration-500"
-                      style={{
-                        backgroundColor: hoveredId === product.id
-                          ? (product.badge_text_color || '#F9F6F0')
-                          : (product.badge_bg_color || '#3D2216'),
-                        color: hoveredId === product.id
-                          ? (product.badge_bg_color || '#3D2216')
-                          : (product.badge_text_color || '#F9F6F0')
-                      }}
-                    >
+                    <div className="inline-flex items-center ml-1 transition-all duration-500">
                       <Image
-                        src="/images/halal_logo.png"
-                        alt="Halal"
-                        width={16}
-                        height={16}
-                        className="w-4 h-4 object-contain rounded-full bg-white p-0.5 shrink-0"
+                        src={hoveredId === product.id ? "/images/halal_icon_white.png" : "/images/halal_icon.png"}
+                        alt="Certification Halal"
+                        width={32}
+                        height={32}
+                        className="w-7 h-7 sm:w-8 sm:h-8 object-contain transition-opacity duration-500"
                       />
-                      HALAL
-                    </span>
+                    </div>
                     {isOutOfStock && (
                       <span className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full font-sans text-[10px] font-bold uppercase tracking-wider bg-[#C83E4D] text-[#F9F6F0] border border-[#C83E4D]/25">
                         Rupture de Stock

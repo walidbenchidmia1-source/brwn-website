@@ -346,16 +346,15 @@ export default function ProductDetailPage({ params }: PageProps) {
                 <Sparkles className="w-3 h-3 text-inherit" />
                 {product.badge_text || "GOURMAND"}
               </span>
-              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-sans text-[10px] font-bold uppercase tracking-wider bg-[#FAF7F2]/15 text-[#FAF7F2] backdrop-blur-xs">
+              <div className="inline-flex items-center ml-1">
                 <Image
-                  src="/images/halal_logo.png"
-                  alt="Halal"
-                  width={16}
-                  height={16}
-                  className="w-4 h-4 object-contain rounded-full bg-white p-0.5 shrink-0"
+                  src="/images/halal_icon_white.png"
+                  alt="Certification Halal"
+                  width={32}
+                  height={32}
+                  className="w-7 h-7 sm:w-8 sm:h-8 object-contain"
                 />
-                HALAL
-              </span>
+              </div>
               {isOutOfStock && (
                 <span className="px-3.5 py-1.5 bg-[#C83E4D] text-[#F9F6F0] text-[10px] font-bold uppercase rounded-full border border-[#C83E4D]/25">
                   Rupture de Stock
