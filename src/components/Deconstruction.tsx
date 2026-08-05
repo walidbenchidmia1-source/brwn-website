@@ -6,7 +6,6 @@ import Link from "next/link";
 import { ArrowRight, X, Check, Coffee, Shell, Leaf, Flame, Star, Sparkles, Heart, Loader, ShoppingBag, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useCart } from "@/context/CartContext";
-import HalalIcon from "@/components/HalalIcon";
 
 interface Ingredient {
   name: string;
@@ -270,13 +269,11 @@ export default function Deconstruction() {
                       {product.badge_text || styles.badge}
                     </span>
                     <div className="inline-flex items-center ml-1.5 transition-all duration-500">
-                      <Image
-                        src={hoveredId === product.id ? "/images/halal_hd_white.png" : "/images/halal_hd.png"}
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={hoveredId === product.id ? "/images/halal_seal_white.png" : "/images/halal_seal.png"}
                         alt="Certification Halal"
-                        width={48}
-                        height={48}
                         className="w-10 h-10 sm:w-12 sm:h-12 object-contain transition-opacity duration-500"
-                        unoptimized
                       />
                     </div>
                     {isOutOfStock && (
