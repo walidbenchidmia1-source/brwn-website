@@ -12,19 +12,28 @@ export default function HalalIcon({ className = "w-10 h-10 sm:w-12 sm:h-12", sty
       style={style}
       aria-label="Certification Halal"
     >
-      <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" strokeWidth="6" />
-      <path
-        d="M 77 44 C 73 40 67 37 60 41 C 55 44 57 49 62 49 C 70 49 76 46 81 43 C 79 42 76 41 73 41 C 64 41 57 46 49 54 C 46 57 40 57 36 54 C 31 51 29 42 29 30 L 29 24 L 23 24 L 23 52 C 23 61 29 67 38 67 C 45 67 51 63 56 57 C 62 63 69 67 77 67 L 79 67 L 79 61 C 75 61 71 56 70 47 Z M 48 42 L 48 24 L 42 24 L 42 46 Z"
-        fill="currentColor"
-      />
+      {/* Outer Circle Ring */}
+      <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" strokeWidth="6.5" />
+
+      {/* Exact Arabic Calligraphy 'حلال' from user's image */}
+      <g fill="currentColor">
+        {/* Left 'ح' Haa stem and sweeping base loop */}
+        <path d="M 33 22 C 30 22 28 25 28 29 L 28 50 C 28 56 34 60 41 60 C 47 60 52 56 56 50 C 61 56 68 60 76 60 L 78 60 L 78 54 C 73 54 70 50 69 42 C 65 38 60 36 53 40 C 49 42 50 47 55 47 C 62 47 67 44 71 42 L 67 40 C 59 40 52 45 45 52 C 42 55 37 55 34 52 C 31 49 29 42 29 33 L 29 22 Z" />
+        {/* Middle 'ل' Laam vertical stem */}
+        <path d="M 52 22 C 50 22 48 24 48 27 L 48 48 C 50 46 51 45 52 44 L 52 27 C 52 24 54 22 52 22 Z" />
+        {/* Far Right 'ا' Alef vertical stem */}
+        <path d="M 72 22 C 70 22 68 24 68 27 L 68 40 C 70 38 71 37 72 36 L 72 27 C 72 24 74 22 72 22 Z" />
+      </g>
+
+      {/* Bold HALAL Text */}
       <text
         x="50"
         y="78"
-        fontSize="16"
+        fontSize="17"
         fontWeight="900"
-        fontFamily="Arial, system-ui, sans-serif"
+        fontFamily="Arial, -apple-system, sans-serif"
         textAnchor="middle"
-        letterSpacing="1"
+        letterSpacing="0.8"
         fill="currentColor"
       >
         HALAL
