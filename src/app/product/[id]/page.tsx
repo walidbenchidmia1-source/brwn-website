@@ -346,8 +346,14 @@ export default function ProductDetailPage({ params }: PageProps) {
                 <Sparkles className="w-3 h-3 text-inherit" />
                 {product.badge_text || "GOURMAND"}
               </span>
-              <span className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full font-sans text-[10px] font-bold uppercase tracking-wider bg-[#FAF7F2]/15 text-[#FAF7F2] backdrop-blur-xs">
-                <CheckCircle2 className="w-3 h-3 text-inherit" />
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-sans text-[10px] font-bold uppercase tracking-wider bg-[#FAF7F2]/15 text-[#FAF7F2] backdrop-blur-xs">
+                <Image
+                  src="/images/halal_logo.png"
+                  alt="Halal"
+                  width={16}
+                  height={16}
+                  className="w-4 h-4 object-contain rounded-full bg-white p-0.5 shrink-0"
+                />
                 HALAL
               </span>
               {isOutOfStock && (

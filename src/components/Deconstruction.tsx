@@ -269,7 +269,7 @@ export default function Deconstruction() {
                       {product.badge_text || styles.badge}
                     </span>
                     <span 
-                      className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full font-sans text-[10px] font-bold uppercase tracking-wider transition-colors duration-500"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-sans text-[10px] font-bold uppercase tracking-wider transition-colors duration-500"
                       style={{
                         backgroundColor: hoveredId === product.id
                           ? (product.badge_text_color || '#F9F6F0')
@@ -279,7 +279,13 @@ export default function Deconstruction() {
                           : (product.badge_text_color || '#F9F6F0')
                       }}
                     >
-                      <CheckCircle2 className="w-3 h-3" style={{ color: 'inherit' }} />
+                      <Image
+                        src="/images/halal_logo.png"
+                        alt="Halal"
+                        width={16}
+                        height={16}
+                        className="w-4 h-4 object-contain rounded-full bg-white p-0.5 shrink-0"
+                      />
                       HALAL
                     </span>
                     {isOutOfStock && (
